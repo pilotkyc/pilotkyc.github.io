@@ -22,6 +22,8 @@ JSON body:
 
 Response `201`: a [Session object](#/result-object) with `status: "created"` and the hosted `url`. The endpoint accepts an [`Idempotency-Key`](#/idempotency).
 
+With a live key, creating a session holds the price on your [prepaid balance](#/billing/hosted-sessions); the hold becomes a charge when your user submits the document, and is released if the session expires or is canceled unused. If the available balance cannot cover the price, the call fails with `402 insufficient_balance` and no session is created.
+
 ```bash
 curl -X POST {{BASE_URL}}/sessions \
   -H "Authorization: Bearer pk_live_YOUR_KEY" \

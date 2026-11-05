@@ -6,7 +6,7 @@ Errors use a common envelope:
 {"error": {"code": "invalid_request", "message": "human readable", "param": "mode"}}
 ```
 
-`param` names the offending field when it applies. Every response, successful or not, carries an `X-Request-Id` header; log it and include it when you contact support.
+`param` names the offending field when it applies. A `402 insufficient_balance` error also carries `available` and `required`. Every response, successful or not, carries an `X-Request-Id` header; log it and include it when you contact support.
 
 ## Error codes
 
@@ -14,6 +14,7 @@ Errors use a common envelope:
 |---|---|---|
 | 400 | `invalid_request` | A field is missing or invalid. See `param` and `message`. |
 | 401 | `unauthorized` | Missing, unknown or revoked API key. |
+| 402 | `insufficient_balance` | The prepaid balance cannot cover the price of this request (live keys only). Nothing was created or charged. The error carries `available` and `required` (USDT, six decimals). See [Billing and balance](#/billing/insufficient-balance). |
 | 403 | `forbidden` | The request is understood but not permitted for this key. |
 | 404 | `not_found` | The resource does not exist. |
 | 409 | `conflict` | The `Idempotency-Key` was reused with a different body. See [Idempotency](#/idempotency). |
@@ -25,7 +26,7 @@ Errors use a common envelope:
 
 ## Handling errors
 
-- `4xx` (except `429`) are not worth retrying until you fix the request.
+- `4xx` (except `429`) are not worth retrying until you fix the request. For `402`, top up your balance first, then retry the same request.
 - Retry `429`, `500` and `503` with backoff, honouring `Retry-After`, and reuse the same `Idempotency-Key`.
 - A verification that cannot be completed because of a recognition failure is reported as `review` with reason `engine_error`, not as an HTTP error. See [Decisions and reason codes](#/decisions-and-reasons).
 

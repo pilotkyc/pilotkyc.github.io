@@ -4,7 +4,7 @@ Create a hosted verification session with a free sandbox key, open the link, and
 
 ## Before you start
 
-- A sandbox API key starting with `pk_test_` and your webhook secret (`whsec_…`). [Ask us for keys]({{CONTACT_URL}}).
+- A sandbox API key starting with `pk_test_` and your webhook secret (`whsec_…`). [Sign up]({{SIGNUP_URL}}), confirm your email, and create the key in the dashboard under **API keys**. Sandbox is free and needs no balance.
 - A public HTTPS URL that can receive webhooks. For local work, a tunnelling tool that exposes your localhost over HTTPS is enough.
 
 > [!WARNING]
@@ -126,4 +126,4 @@ curl {{BASE_URL}}/sessions/ses_2b9f… \
 
 ## Go live
 
-Swap the `pk_test_` key for a `pk_live_` key. Nothing else changes in your integration: same endpoints, same result object, same webhooks.
+Create a `pk_live_` key in the dashboard (this needs a confirmed email and your password) and [top up your balance](#/billing); each live verification costs 0.05 USDT. Swap the `pk_test_` key for the `pk_live_` key. Nothing else changes in your integration: same endpoints, same result object, same webhooks. If the balance is too low, creating a session or check returns [`402 insufficient_balance`](#/billing/insufficient-balance).

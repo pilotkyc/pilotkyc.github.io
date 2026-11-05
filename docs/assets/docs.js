@@ -33,6 +33,8 @@
       .replace(/\{\{API_ORIGIN\}\}/g, CFG.apiOrigin || "")
       .replace(/\{\{VERSION\}\}/g, CFG.version || "")
       .replace(/\{\{CONTACT_URL\}\}/g, CFG.contactUrl || "")
+      .replace(/\{\{SIGNUP_URL\}\}/g, CFG.signupUrl || "")
+      .replace(/\{\{LOGIN_URL\}\}/g, CFG.loginUrl || "")
       .replace(/\{\{OPENAPI_URL\}\}/g, openapi)
       .replace(/\{\{SWAGGER_URL\}\}/g, "https://editor.swagger.io/?url=" + encodeURIComponent(openapi));
   }

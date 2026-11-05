@@ -5,6 +5,7 @@ Sandbox keys (`pk_test_…`) let you build and test your whole integration for f
 - The recognition engine is **never called**.
 - No image is stored.
 - Results are **deterministic**.
+- **Nothing is charged** and no balance is needed. `price` is `null`.
 
 Everything else is the same as in production: the same endpoints, the same [result object](#/result-object), the same [webhooks](#/webhooks) and the same signature.
 
@@ -43,7 +44,7 @@ Hosted sandbox sessions show the real capture page with a **Sandbox** ribbon and
 
 ## Going live
 
-Replace the key with a `pk_live_` key. Your code, webhooks and result handling stay the same.
+Create a `pk_live_` key in the dashboard, top up your [balance](#/billing) and replace the key. Your code, webhooks and result handling stay the same.
 
 > [!TIP]
 > Test every branch before going live: `approved`, `declined` with a reason, `review`, and an expired session.

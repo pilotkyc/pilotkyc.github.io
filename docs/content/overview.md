@@ -27,6 +27,7 @@ You can use either style, or both:
 - **Authentication** is a server-side Bearer API key. `pk_live_` keys run real recognition; `pk_test_` keys use the free sandbox. See [Authentication](#/authentication).
 - **Result object** is the same shape for sessions and direct checks. See [Result object](#/result-object).
 - **Webhooks** are signed with HMAC-SHA256 in the `PilotKYC-Signature` header. See [Webhooks](#/webhooks).
+- **Billing** is prepaid: top up a USDT balance with crypto, 0.05 USDT per live verification, sandbox is free. See [Billing and balance](#/billing).
 - **Idempotency** keys make creating sessions and checks safe to retry. See [Idempotency](#/idempotency).
 - **Privacy**: images are deleted right after the check; personal data is kept at most 30 days by default and can be erased via the API at any time. See [Data retention and privacy](#/data-retention-and-privacy).
 
@@ -36,7 +37,7 @@ You can use either style, or both:
 2. Read [Webhooks](#/webhooks) and implement signature verification.
 3. Read the [Integration guides](#/integration-guides) for an exchange onboarding flow or a P2P merchant flow.
 
-Need API keys? [Contact us]({{CONTACT_URL}}).
+Need API keys? [Sign up]({{SIGNUP_URL}}) and create them in the dashboard. Live verifications are paid from a prepaid USDT balance: see [Billing and balance](#/billing).
 
 ## Limitations in v1
 
@@ -50,5 +51,4 @@ Need API keys? [Contact us]({{CONTACT_URL}}).
 > - AML / sanctions screening
 > - KYB (business verification)
 > - Phone and email checks
-> - A partner web dashboard (API keys are issued by the PilotKYC team)
 > - Per-country document templates beyond what the recognition engine already reads

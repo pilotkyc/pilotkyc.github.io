@@ -127,12 +127,14 @@ paths:
                 document: null
                 scores: {document_authenticity: null, name_match: null, face_match: null, liveness: null}
                 expected_name: Nguyen Van A
+                price: {amount: "0.050000", currency: USDT}
                 data_erased: false
                 created_at: "2026-11-05T07:00:00Z"
                 completed_at: null
                 expires_at: "2026-11-06T07:00:00Z"
         "400": {$ref: "#/components/responses/InvalidRequest"}
         "401": {$ref: "#/components/responses/Unauthorized"}
+        "402": {$ref: "#/components/responses/InsufficientBalance"}
         "409": {$ref: "#/components/responses/Conflict"}
         "413": {$ref: "#/components/responses/PayloadTooLarge"}
         "415": {$ref: "#/components/responses/UnsupportedMediaType"}
@@ -198,6 +200,7 @@ paths:
                   mrz_checked: true
                 scores: {document_authenticity: 0.86, name_match: 0.97, face_match: 0.81, liveness: 0.9}
                 expected_name: Nguyen Van A
+                price: {amount: "0.050000", currency: USDT}
                 data_erased: false
                 created_at: "2026-11-05T07:00:00Z"
                 completed_at: "2026-11-05T07:01:12Z"
@@ -325,12 +328,14 @@ paths:
                   mrz_checked: true
                 scores: {document_authenticity: 0.86, name_match: 0.97, face_match: 0.02, liveness: 0.9}
                 expected_name: Nguyen Van A
+                price: {amount: "0.050000", currency: USDT}
                 data_erased: false
                 created_at: "2026-11-05T07:00:00Z"
                 completed_at: "2026-11-05T07:00:41Z"
                 expires_at: null
         "400": {$ref: "#/components/responses/InvalidRequest"}
         "401": {$ref: "#/components/responses/Unauthorized"}
+        "402": {$ref: "#/components/responses/InsufficientBalance"}
         "409": {$ref: "#/components/responses/Conflict"}
         "413": {$ref: "#/components/responses/PayloadTooLarge"}
         "415": {$ref: "#/components/responses/UnsupportedMediaType"}
@@ -662,6 +667,19 @@ components:
         application/json:
           schema: {$ref: "#/components/schemas/Error"}
           example: {error: {code: unauthorized, message: "Missing, unknown or revoked API key."}}
+    InsufficientBalance:
+      description: |
+        The balance cannot cover the price (live keys only). Nothing was created or processed.
+        `available` and `required` are USDT amounts with 6 decimals.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example:
+            error:
+              code: insufficient_balance
+              message: "Insufficient balance: 0.020000 USDT available, 0.050000 USDT required. Top up to continue."
+              available: "0.020000"
+              required: "0.050000"
     NotFound:
       description: Unknown id (or it belongs to another tenant / mode).
       content:
@@ -723,10 +741,12 @@ components:
           properties:
             code:
               type: string
-              enum: [invalid_request, unauthorized, forbidden, not_found, conflict, payload_too_large,
+              enum: [invalid_request, unauthorized, insufficient_balance, forbidden, not_found, conflict, payload_too_large,
                      unsupported_media_type, rate_limited, engine_unavailable, internal_error]
             message: {type: string}
             param: {type: string}
+            available: {type: string, description: "insufficient_balance only: spendable USDT, 6 decimals."}
+            required: {type: string, description: "insufficient_balance only: the price, USDT, 6 decimals."}
     Mode:
       type: string
       enum: [document, selfie_document]
@@ -788,10 +808,16 @@ components:
         mrz_checked:
           type: boolean
           description: True when a machine-readable zone was read and every check digit passed.
+    Price:
+      type: object
+      required: [amount, currency]
+      properties:
+        amount: {type: string, example: "0.050000", description: "USDT, exactly 6 decimals."}
+        currency: {type: string, enum: [USDT]}
     Result:
       type: object
       required: [id, object, livemode, mode, status, reference_id, metadata, decision, reasons, document,
-                 scores, expected_name, data_erased, created_at, completed_at, expires_at]
+                 scores, expected_name, price, data_erased, created_at, completed_at, expires_at]
       properties:
         id: {type: string}
         object: {type: string, enum: [session, check]}
@@ -810,6 +836,11 @@ components:
         document: {$ref: "#/components/schemas/DocumentData"}
         scores: {$ref: "#/components/schemas/Scores"}
         expected_name: {type: [string, "null"]}
+        price:
+          oneOf: [{$ref: "#/components/schemas/Price"}, {type: "null"}]
+          description: |
+            What this live result costs (USDT). Null for sandbox keys, for accounts exempt from billing, and for
+            results that were not charged or were refunded (our own engine failure).
         data_erased: {type: boolean}
         created_at: {type: string, format: date-time}
         completed_at: {type: [string, "null"], format: date-time}

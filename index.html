@@ -67,8 +67,10 @@
         <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
         <a href="#faq" data-i18n="nav.faq">FAQ</a>
         <a href="docs/" data-i18n="nav.docs">Docs</a>
+        <a class="nav-login" href="https://kyc.pilotbot.net/dashboard/login" data-login data-i18n="nav.login" rel="noopener">Log in</a>
       </nav>
       <div class="header-actions">
+        <a class="header-login" href="https://kyc.pilotbot.net/dashboard/login" data-login data-i18n="nav.login" rel="noopener">Log in</a>
         <div class="lang" role="group" aria-label="Language">
           <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
           <button type="button" class="lang-btn" data-lang="ru" aria-pressed="false">RU</button>
@@ -89,7 +91,7 @@
           <p class="lead" data-i18n="hero.lead">PilotKYC checks identity documents, matches faces and detects spoofing for exchanges, P2P merchants, fintech and marketplaces. Send your user a link or call the API. Get a signed answer you can trust.</p>
           <div class="cta-row">
             <a class="btn btn-primary" href="docs/"><span data-i18n="cta.docs">Read the docs</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-            <a class="btn btn-secondary" href="https://t.me/pilotbotnet" data-contact data-i18n="cta.keys" rel="noopener">Get API keys</a>
+            <a class="btn btn-secondary" href="https://kyc.pilotbot.net/dashboard/signup" data-signup data-i18n="cta.keys" rel="noopener">Get API keys</a>
           </div>
           <ul class="chips">
             <li data-i18n="hero.chip1">Free sandbox keys</li>
@@ -187,7 +189,7 @@
             </ul>
           </article>
         </div>
-        <p class="note" data-i18n="modes.note">Result in seconds for documents with an MRZ. PilotKYC reads the front side or data page of the document.</p>
+        <p class="note" data-i18n="modes.note">Result in seconds for documents with an MRZ. Other documents, read by the AI, usually take from about 30 seconds up to 2 minutes. PilotKYC reads the front side or data page of the document.</p>
       </div>
     </section>
 
@@ -379,7 +381,7 @@ other      &rarr; approved</code></pre>
             <p class="price"><span data-price="sandbox">Free</span></p>
             <p class="muted" data-i18n="pr.sb.p">Build and test your integration.</p>
             <ul class="ticks">
-              <li data-i18n="pr.sb.l1">pk_test_ keys</li>
+              <li data-i18n="pr.sb.l1">pk_test_ keys, no charge</li>
               <li data-i18n="pr.sb.l2">Deterministic outcomes</li>
               <li data-i18n="pr.sb.l3">No images stored</li>
             </ul>
@@ -387,14 +389,15 @@ other      &rarr; approved</code></pre>
           </article>
           <article class="card price-card card-featured">
             <h3 data-i18n="pr.pr.t">Production</h3>
-            <p class="price"><span data-price="production">$0.05</span> <small data-i18n="pr.pr.unit">per verification</small></p>
-            <p class="muted" data-i18n="pr.pr.p">Real recognition, pay as you go.</p>
+            <p class="price"><span data-price="production">0.05</span> <small data-i18n="pr.pr.unit">USDT per verification</small></p>
+            <p class="muted" data-i18n="pr.pr.p">Real recognition from a prepaid USDT balance. Top up with crypto via OxaPay. You are charged only when a decision is produced.</p>
             <ul class="ticks">
-              <li data-i18n="pr.pr.l1">Both modes included</li>
-              <li data-i18n="pr.pr.l2">Hosted link and direct API</li>
-              <li data-i18n="pr.pr.l3">Signed webhooks</li>
+              <li data-i18n="pr.pr.l1">Prepaid balance, top-ups from 10 USDT</li>
+              <li data-i18n="pr.pr.l2">Same price in both modes</li>
+              <li data-i18n="pr.pr.l3">Refunded automatically if our engine fails</li>
+              <li data-i18n="pr.pr.l4">Hosted link, direct API and signed webhooks</li>
             </ul>
-            <a class="btn btn-primary" href="https://t.me/pilotbotnet" data-contact data-i18n="cta.keys" rel="noopener">Get API keys</a>
+            <a class="btn btn-primary" href="https://kyc.pilotbot.net/dashboard/signup" data-signup data-i18n="cta.keys" rel="noopener">Get API keys</a>
           </article>
           <article class="card price-card">
             <h3 data-i18n="pr.vo.t">Volume</h3>
@@ -424,7 +427,7 @@ other      &rarr; approved</code></pre>
           </details>
           <details>
             <summary data-i18n="faq.q2">How fast is a result?</summary>
-            <p data-i18n="faq.a2">Seconds for documents with an MRZ. You are notified by webhook as soon as the decision is ready, or you can poll the session.</p>
+            <p data-i18n="faq.a2">Seconds for documents with an MRZ. Other documents (read by the AI) usually take from about 30 seconds up to 2 minutes. You are notified by webhook as soon as the decision is ready, or you can poll the session.</p>
           </details>
           <details>
             <summary data-i18n="faq.q3">Do you store my users' photos?</summary>
@@ -444,7 +447,11 @@ other      &rarr; approved</code></pre>
           </details>
           <details>
             <summary data-i18n="faq.q7">How do I get API keys?</summary>
-            <p><span data-i18n="faq.a7">Message us and we will issue sandbox and production keys together with your webhook secret.</span> <a href="https://t.me/pilotbotnet" data-contact data-i18n="faq.a7l" rel="noopener">Contact us</a></p>
+            <p><span data-i18n="faq.a7">Sign up in the dashboard, confirm your email and create API keys yourself: sandbox keys are free, live keys use your prepaid balance.</span> <a href="https://kyc.pilotbot.net/dashboard/signup" data-signup data-i18n="faq.a7l" rel="noopener">Sign up</a></p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q8">How do I pay?</summary>
+            <p data-i18n="faq.a8">Top up a prepaid USDT balance in the dashboard with crypto via OxaPay (from 10 to 5000 USDT per top-up). Each live verification costs 0.05 USDT and is charged only when a decision is produced; if our engine fails, the check is refunded automatically. Pay the exact amount shown on the invoice; if you paid a different amount, contact support.</p>
           </details>
         </div>
       </div>
@@ -454,10 +461,10 @@ other      &rarr; approved</code></pre>
     <section class="cta-band" aria-labelledby="cta-h">
       <div class="wrap cta-inner">
         <h2 id="cta-h" data-i18n="final.title">Ready to verify your first user?</h2>
-        <p data-i18n="final.p">Get sandbox keys, create a session and see a signed webhook arrive in minutes.</p>
+        <p data-i18n="final.p">Sign up, create a sandbox key, create a session and see a signed webhook arrive in minutes.</p>
         <div class="cta-row cta-center">
           <a class="btn btn-light" href="docs/#/quickstart" data-i18n="final.cta1">Open the quickstart</a>
-          <a class="btn btn-ghost" href="https://t.me/pilotbotnet" data-contact data-i18n="cta.keys" rel="noopener">Get API keys</a>
+          <a class="btn btn-ghost" href="https://kyc.pilotbot.net/dashboard/signup" data-signup data-i18n="cta.keys" rel="noopener">Get API keys</a>
         </div>
       </div>
     </section>

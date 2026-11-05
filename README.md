@@ -31,13 +31,14 @@ docs/
 Edit `assets/site-config.js`. It is the single place for:
 
 - `baseUrl` / `apiOrigin`: used for `{{BASE_URL}}` and `{{API_ORIGIN}}` in every docs page and in the landing page snippet
-- `contactUrl`: the "Get API keys" button and `{{CONTACT_URL}}` in the docs
+- `contactUrl`: the volume / contact links and `{{CONTACT_URL}}` in the docs
+- `signupUrl` / `loginUrl`: every "Get API keys" button, the header "Log in" link, `{{SIGNUP_URL}}` / `{{LOGIN_URL}}` in the docs
 - `pricing`: the landing page price cards
 - `version`
 
 ## Edit the docs
 
-Pages live in `docs/content/*.md`; the sidebar order is `docs/content/manifest.json`. To add a page, create the `.md` file and add an entry to the manifest. Placeholders available in markdown: `{{BASE_URL}}`, `{{API_ORIGIN}}`, `{{VERSION}}`, `{{CONTACT_URL}}`, `{{OPENAPI_URL}}`, `{{SWAGGER_URL}}`. Callouts use `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!DANGER]`. Consecutive code fences with `tab="Name"` become tabs.
+Pages live in `docs/content/*.md`; the sidebar order is `docs/content/manifest.json`. To add a page, create the `.md` file and add an entry to the manifest. Placeholders available in markdown: `{{BASE_URL}}`, `{{API_ORIGIN}}`, `{{VERSION}}`, `{{CONTACT_URL}}`, `{{SIGNUP_URL}}`, `{{LOGIN_URL}}`, `{{OPENAPI_URL}}`, `{{SWAGGER_URL}}`. Callouts use `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!DANGER]`. Consecutive code fences with `tab="Name"` become tabs.
 
 ## Preview locally
 

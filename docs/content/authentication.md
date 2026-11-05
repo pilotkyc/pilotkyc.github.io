@@ -13,7 +13,7 @@ Authorization: Bearer pk_live_YOUR_KEY
 
 | Key prefix | Environment | Behaviour |
 |---|---|---|
-| `pk_live_…` | Production | Real recognition. |
+| `pk_live_…` | Production | Real recognition. Charged from your prepaid balance. See [Billing](#/billing). |
 | `pk_test_…` | Sandbox | Never calls the recognition engine, never stores images, returns deterministic results. Free. See [Sandbox](#/sandbox). |
 
 Every object carries `livemode: true|false` so you can tell which environment produced it.
@@ -28,7 +28,13 @@ Each tenant also has a `webhook_secret` (`whsec_…`) that is used only to sign 
 
 ## Getting keys
 
-API keys and the webhook secret are issued by the PilotKYC team on request: [get API keys]({{CONTACT_URL}}). A self-service dashboard is on the roadmap and is not part of v1.
+Create your keys yourself in the dashboard:
+
+1. [Sign up]({{SIGNUP_URL}}) and confirm your email. A sandbox key and your webhook secret are available right away.
+2. Open **API keys** and create a key. Choose sandbox (`pk_test_`) or live (`pk_live_`). A live key needs a confirmed email and your account password.
+3. Copy the key immediately: it is shown once. You can revoke a key at any time, and a revoked key returns `401`.
+
+Already registered? [Log in]({{LOGIN_URL}}). Live keys spend your prepaid balance; see [Billing and balance](#/billing). Dashboard sessions and API keys are separate: an API key never works in the dashboard, and a dashboard login never works on `/v1/*`.
 
 ## Authentication errors
 

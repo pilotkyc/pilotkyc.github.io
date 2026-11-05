@@ -5,7 +5,8 @@
       "pages": [
         { "slug": "overview", "file": "overview.md", "title": "Overview" },
         { "slug": "quickstart", "file": "quickstart.md", "title": "Quickstart (sandbox)" },
-        { "slug": "authentication", "file": "authentication.md", "title": "Authentication" }
+        { "slug": "authentication", "file": "authentication.md", "title": "Authentication" },
+        { "slug": "billing", "file": "billing.md", "title": "Billing and balance" }
       ]
     },
     {

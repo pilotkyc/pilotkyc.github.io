@@ -29,6 +29,7 @@ Sessions and direct checks return the same object. A direct check has `object: "
     "liveness": 0.9
   },
   "expected_name": "Nguyen Van A",
+  "price": { "amount": "0.050000", "currency": "USDT" },
   "data_erased": false,
   "created_at": "2026-11-05T07:00:00Z",
   "completed_at": "2026-11-05T07:01:12Z",
@@ -53,6 +54,7 @@ Sessions and direct checks return the same object. A direct check has `object: "
 | `document` | Extracted data: `name`, `date_of_birth`, `document_number`, `nationality`, `expiry_date`, and `mrz_checked`. |
 | `scores` | Numbers from 0 to 1, higher is better. `null` means not applicable. |
 | `expected_name` | The name you asked to compare with. |
+| `price` | `{"amount": "0.050000", "currency": "USDT"}` for live results that are charged or held; `null` when nothing is owed (sandbox, released, refunded). See [Billing and balance](#/billing/price-in-results). |
 | `data_erased` | `true` after the personal data was erased (manually or by retention). |
 | `created_at`, `completed_at`, `expires_at` | ISO 8601 timestamps in UTC. |
 

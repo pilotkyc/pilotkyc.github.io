@@ -677,7 +677,8 @@ components:
     Gone:
       description: |
         The session can no longer be used. The body tells the page which screen to show:
-        `session_expired` / `session_canceled` / `session_submitted`, mirrored in the top-level `status`.
+        `session_expired` / `session_canceled` / `session_submitted` / `session_attempts_exceeded` (the session was
+        closed after too many failed uploads; its top-level `status` is `expired`), mirrored in the top-level `status`.
         The decision is never disclosed.
       content:
         application/json:
@@ -689,7 +690,7 @@ components:
                 type: object
                 required: [code, message]
                 properties:
-                  code: {type: string, enum: [session_expired, session_canceled, session_submitted]}
+                  code: {type: string, enum: [session_expired, session_canceled, session_submitted, session_attempts_exceeded]}
                   message: {type: string}
               status: {type: string, enum: [expired, canceled, submitted]}
           example: {error: {code: session_expired, message: This verification link has expired.}, status: expired}

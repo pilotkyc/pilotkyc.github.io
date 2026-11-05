@@ -52,7 +52,8 @@ info:
     Header `PilotKYC-Signature: t=<unix_ts>,v1=<hex HMAC-SHA256(webhook_secret, "<t>.<raw_body>")>`.
     Reject timestamps older than 5 minutes. Up to 8 attempts with exponential backoff
     (10 s, 30 s, 2 min, 10 min, 30 min, 1 h, 6 h) until a 2xx answer; every attempt is logged.
-    Callback URLs must be https and resolve to public addresses; redirects are not followed.
+    Callback URLs must be https on port 443 (or 8443) and resolve to public addresses; redirects are not followed;
+    an attempt is cut off after 15 s in total.
     Events are not guaranteed to arrive in order: use `data.status` / poll the session.
 
     ## Privacy
@@ -228,8 +229,8 @@ paths:
       operationId: eraseSessionData
       summary: Erase personal data of a finished session
       description: |
-        Nulls `document` and `expected_name`, the consent IP / user agent and stored webhook
-        payloads. Scores, decision and reasons stay. Idempotent. `409` while the session is not finished.
+        Nulls `document`, `expected_name` and `metadata`, the consent IP / user agent and stored webhook
+        payloads. `reference_id` is kept for correlation: do not put personal data in `reference_id` or `metadata`. Scores, decision and reasons stay. Idempotent. `409` while the session is not finished.
       parameters: [{$ref: "#/components/parameters/SessionId"}]
       responses:
         "200":
@@ -744,7 +745,8 @@ components:
       type: string
       enum: [document_not_found, document_unreadable, document_incomplete, document_suspicious,
              document_expired, mrz_invalid, name_mismatch, face_not_found, face_mismatch,
-             liveness_failed, low_document_quality, low_face_match, low_liveness, engine_error]
+             liveness_failed, low_document_quality, low_face_match, low_liveness,
+             document_expiry_unknown, engine_error]
     WebhookEventType:
       type: string
       enum: [session.in_progress, session.completed, session.expired, session.canceled]
@@ -756,7 +758,7 @@ components:
         mode: {$ref: "#/components/schemas/Mode"}
         reference_id: {type: string, maxLength: 128, description: Your own user/order id, echoed back.}
         expected_name: {type: string, maxLength: 200, description: Full name to compare with the document.}
-        callback_url: {type: string, format: uri, description: "https only; overrides the tenant default. Must resolve to public addresses."}
+        callback_url: {type: string, format: uri, description: "https only, port 443 or 8443; overrides the tenant default. Must resolve to public addresses."}
         redirect_url: {type: string, format: uri, description: https URL the user is sent to after finishing.}
         language: {$ref: "#/components/schemas/Language"}
         expires_in: {type: integer, minimum: 300, maximum: 604800, default: 86400, description: Seconds.}

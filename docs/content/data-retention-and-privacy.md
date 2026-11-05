@@ -39,3 +39,8 @@ On the hosted page the user gives consent before capturing. PilotKYC records the
 ## Webhook payload contents
 
 Webhook payloads contain the full Session object, which includes extracted personal data while it is retained. Receive webhooks only on an HTTPS endpoint you control, verify the signature, and avoid logging the full body.
+
+
+## What not to put in `reference_id` and `metadata`
+
+These two fields are yours and are echoed back unchanged. Do not put personal data (names, emails, phone numbers, document numbers) in them — use your own internal ids. On erasure (`DELETE /v1/sessions/{id}/data`) and when the retention period ends, `metadata` is cleared; `reference_id` is kept so you can still match the record to your user.

@@ -1,6 +1,6 @@
 # Webhooks
 
-PilotKYC notifies your backend when a session changes state. Webhooks are sent to the session's `callback_url`, or to your tenant default when the session has none.
+PilotKYC notifies your backend when a session changes state. Webhooks are sent to the session's `callback_url`, or to your tenant default when the session has none. The URL must be HTTPS on port 443 or 8443 and resolve to a public IP address; the response body is ignored and each attempt is cut off after 15 seconds, so answer `2xx` quickly and process the event asynchronously.
 
 ## Events
 

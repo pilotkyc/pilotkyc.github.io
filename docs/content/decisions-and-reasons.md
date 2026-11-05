@@ -24,7 +24,8 @@ PilotKYC's decision layer turns recognition signals (0..1) into the decision usi
 | `document_unreadable` | A document is present but cannot be read. |
 | `document_incomplete` | The document is only partly visible or key data is missing. |
 | `document_suspicious` | Tampering, screen-capture or print signals. |
-| `document_expired` | The document is past its expiry date. |
+| `document_expired` | The document is past its expiry date (`declined` when the MRZ checked out, otherwise `review`). |
+| `document_expiry_unknown` | The expiry date is missing or could not be read reliably. PilotKYC never approves a document without a known, future expiry date, so the result is `review`. |
 | `mrz_invalid` | The MRZ checksum does not validate. |
 | `name_mismatch` | The extracted name does not match `expected_name`. |
 | `face_not_found` | No face was found in the document photo or the selfie. |

@@ -13,7 +13,7 @@ JSON body:
 | `mode` | enum | yes | `document` or `selfie_document`. See [modes](#/modes). |
 | `reference_id` | string | no | Your own user or order id, up to 128 characters; echoed back. |
 | `expected_name` | string | no | Full name to compare with the document (Latin or native script). |
-| `callback_url` | string | no | HTTPS URL for webhooks; overrides the tenant default. |
+| `callback_url` | string | no | HTTPS URL for webhooks on port 443 or 8443; overrides the tenant default. |
 | `redirect_url` | string | no | HTTPS URL the user is sent to after finishing. |
 | `language` | string | no | Language of the hosted page: `en`, `ru`, `th`, `vi`, `pt`, `es`, `zh`. Default `en`. |
 | `expires_in` | integer | no | Seconds, `300`..`604800`. Default `86400` (24 hours). |

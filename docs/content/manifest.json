@@ -1,0 +1,41 @@
+{
+  "groups": [
+    {
+      "title": "Getting started",
+      "pages": [
+        { "slug": "overview", "file": "overview.md", "title": "Overview" },
+        { "slug": "quickstart", "file": "quickstart.md", "title": "Quickstart (sandbox)" },
+        { "slug": "authentication", "file": "authentication.md", "title": "Authentication" }
+      ]
+    },
+    {
+      "title": "Concepts",
+      "pages": [
+        { "slug": "modes", "file": "modes.md", "title": "Verification modes" },
+        { "slug": "hosted-sessions", "file": "hosted-sessions.md", "title": "Hosted sessions", "tag": "POST" },
+        { "slug": "direct-checks", "file": "direct-checks.md", "title": "Direct checks", "tag": "POST" },
+        { "slug": "result-object", "file": "result-object.md", "title": "Result object" },
+        { "slug": "decisions-and-reasons", "file": "decisions-and-reasons.md", "title": "Decisions and reason codes" }
+      ]
+    },
+    {
+      "title": "Integration",
+      "pages": [
+        { "slug": "webhooks", "file": "webhooks.md", "title": "Webhooks" },
+        { "slug": "idempotency", "file": "idempotency.md", "title": "Idempotency" },
+        { "slug": "errors", "file": "errors.md", "title": "Errors" },
+        { "slug": "rate-limits", "file": "rate-limits.md", "title": "Rate limits" },
+        { "slug": "sandbox", "file": "sandbox.md", "title": "Sandbox" },
+        { "slug": "data-retention-and-privacy", "file": "data-retention-and-privacy.md", "title": "Data retention and privacy" },
+        { "slug": "integration-guides", "file": "integration-guides.md", "title": "Integration guides" }
+      ]
+    },
+    {
+      "title": "Reference",
+      "pages": [
+        { "slug": "api-reference", "file": "api-reference.md", "title": "API reference" },
+        { "slug": "changelog", "file": "changelog.md", "title": "Changelog" }
+      ]
+    }
+  ]
+}

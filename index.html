@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PilotKYC — Identity verification API for exchanges, P2P and fintech</title>
+  <meta name="description" content="Identity verification API: document check with data extraction, selfie face match and passive liveness. Hosted link or direct API, signed webhooks, free sandbox, images deleted right after the check.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0b1020">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PilotKYC">
+  <meta property="og:title" content="PilotKYC — Identity verification API">
+  <meta property="og:description" content="Document check, selfie face match and passive liveness. Hosted link or direct API. Free sandbox. Images deleted right after the check.">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PilotKYC — Identity verification API">
+  <meta name="twitter:description" content="Document check, selfie face match and passive liveness. Hosted link or direct API. Free sandbox.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/landing.css">
+</head>
+<body>
+  <!-- Inline SVG sprite -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#3b6bff"/>
+        <stop offset="1" stop-color="#12b3a4"/>
+      </linearGradient>
+      <symbol id="i-logo" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="url(#grad)"/><path d="M16 6.5 24 9.6v6.1c0 4.7-3.2 8.2-8 9.8-4.8-1.6-8-5.1-8-9.8V9.6z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="m12.2 16.2 2.9 2.9 5-5.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-doc" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="8.5" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6 16c.6-1.6 1.6-2.3 2.5-2.3S10.400 14.400 11 16M14 9.500h4M14 12.500h4M14 15.500h2.500" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-face" viewBox="0 0 24 24"><path d="M4 8V6.500A2.500 2.500 0 0 1 6.500 4H8M16 4h1.500A2.500 2.500 0 0 1 20 6.500V8M20 16v1.500a2.500 2.500 0 0 1-2.500 2.500H16M8 20H6.500A2.500 2.500 0 0 1 4 17.500V16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="10.500" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M6.800 18c.9-2.300 2.800-3.500 5.200-3.500s4.300 1.200 5.200 3.500" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-code" viewBox="0 0 24 24"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M13.500 5 10.500 19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 13.500h6L10 21l8-10.500h-6z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.500" width="14" height="9.500" rx="2.500" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 10.500V8a4 4 0 0 1 8 0v2.500" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.500 7h15M9.500 7V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2M6.500 7l.8 12a1.500 1.500 0 0 0 1.500 1.400h6.400a1.500 1.500 0 0 0 1.500-1.400l.8-12M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.500 12h17M12 3.500c2.500 2.600 3.600 5.400 3.600 8.500S14.500 17.900 12 20.500C9.500 17.900 8.400 15.100 8.400 12S9.500 6.100 12 3.500z" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+      <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="3.500" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m10.500 12.500 8-8M15.500 7.500l2.500 2.500M13.500 9.500 15.500 11.500" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-hook" viewBox="0 0 24 24"><path d="M12 8.500a2.500 2.500 0 1 0-2.200-1.300L7.300 11.500M6.500 15a2.500 2.500 0 1 0 1.800 4.200h7.200M17.500 19a2.500 2.500 0 1 0 .8-4.800L15.700 9.600" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9.500 4h5M10.500 4v5.500L5.200 18a2 2 0 0 0 1.700 3h10.200a2 2 0 0 0 1.700-3l-5.300-8.500V4M8 14.500h8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2.500" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10.500 18h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-send" viewBox="0 0 24 24"><path d="m4 11.500 16-7-6 16-2.800-6.700z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m8.500 12.200 2.500 2.500 4.500-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-swap" viewBox="0 0 24 24"><path d="M5 8h13l-3-3M19 16H6l3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9.500 5.500 4.500h13L20 9.500M4 9.500a2.700 2.700 0 0 0 5.300 0 2.700 2.700 0 0 0 5.400 0 2.700 2.700 0 0 0 5.300 0M5.500 12.500V20h13v-7.500M10 20v-4.500h4V20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M4 7.500A2.500 2.500 0 0 1 6.500 5H17v3M4 7.500V17a2 2 0 0 0 2 2h12.500a1.500 1.500 0 0 0 1.500-1.500V9.500A1.500 1.500 0 0 0 18.500 8H6.500A2.500 2.500 0 0 1 4 7.500z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="16.200" cy="13.500" r="1.100" fill="currentColor"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.500" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.500 19c.6-3 2.800-4.700 5.500-4.700s4.900 1.700 5.500 4.700M16 5.700a3 3 0 0 1 0 5.600M17.500 14.500c1.700.6 2.800 2 3.200 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-tick" viewBox="0 0 24 24"><path d="m5 12.500 4.500 4.500L19 7.500" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      <symbol id="i-theme" viewBox="0 0 24 24"><path d="M20 14.500A8 8 0 0 1 9.500 4 8 8 0 1 0 20 14.500z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    </defs>
+  </svg>
+
+  <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+
+  <header class="header" id="top">
+    <div class="wrap header-inner">
+      <a class="logo" href="#top" aria-label="PilotKYC">
+        <svg class="logo-mark" aria-hidden="true"><use href="#i-logo"/></svg>
+        <span>PilotKYC</span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Main">
+        <a href="#how" data-i18n="nav.how">How it works</a>
+        <a href="#modes" data-i18n="nav.modes">Modes</a>
+        <a href="#security" data-i18n="nav.security">Security</a>
+        <a href="#developers" data-i18n="nav.dev">Developers</a>
+        <a href="#pricing" data-i18n="nav.pricing">Pricing</a>
+        <a href="#faq" data-i18n="nav.faq">FAQ</a>
+        <a href="docs/" data-i18n="nav.docs">Docs</a>
+      </nav>
+      <div class="header-actions">
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" class="lang-btn" data-lang="ru" aria-pressed="false">RU</button>
+        </div>
+        <button type="button" class="icon-btn" id="theme-btn" aria-label="Toggle theme"><svg aria-hidden="true"><use href="#i-theme"/></svg></button>
+        <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="nav"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="hero.eyebrow">Identity verification API</p>
+          <h1 data-i18n="hero.title">Verify real people in seconds, not days</h1>
+          <p class="lead" data-i18n="hero.lead">PilotKYC checks identity documents, matches faces and detects spoofing for exchanges, P2P merchants, fintech and marketplaces. Send your user a link or call the API. Get a signed answer you can trust.</p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="docs/"><span data-i18n="cta.docs">Read the docs</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            <a class="btn btn-secondary" href="https://t.me/pilotbotnet" data-contact data-i18n="cta.keys" rel="noopener">Get API keys</a>
+          </div>
+          <ul class="chips">
+            <li data-i18n="hero.chip1">Free sandbox keys</li>
+            <li data-i18n="hero.chip2">7 languages on the hosted page</li>
+            <li data-i18n="hero.chip3">HMAC-SHA256 signed webhooks</li>
+          </ul>
+        </div>
+        <div class="hero-code" aria-label="Example request and result">
+          <div class="code-card">
+            <div class="code-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-title">curl</span></div>
+<pre><code><span class="c-k">curl</span> -X POST <span class="c-s" data-base-url>https://kyc-api.pilotbot.net/v1</span>/sessions \
+  -H <span class="c-s">"Authorization: Bearer pk_test_…"</span> \
+  -H <span class="c-s">"Content-Type: application/json"</span> \
+  -d <span class="c-s">'{
+    "mode": "selfie_document",
+    "reference_id": "user-1842",
+    "language": "en"
+  }'</span></code></pre>
+          </div>
+          <div class="code-card code-card-result">
+            <div class="code-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span class="code-title">webhook &middot; session.completed</span><span class="pill pill-ok">approved</span></div>
+<pre><code>{
+  <span class="c-p">"decision"</span>: <span class="c-s">"approved"</span>,
+  <span class="c-p">"reasons"</span>: [],
+  <span class="c-p">"scores"</span>: {
+    <span class="c-p">"document_authenticity"</span>: <span class="c-n">0.86</span>,
+    <span class="c-p">"face_match"</span>: <span class="c-n">0.81</span>,
+    <span class="c-p">"liveness"</span>: <span class="c-n">0.9</span>
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how" aria-labelledby="how-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="how.eyebrow">How it works</p>
+          <h2 id="how-h" data-i18n="how.title">Three steps from signup to a decision</h2>
+        </div>
+        <ol class="steps">
+          <li class="step">
+            <span class="step-num" aria-hidden="true">1</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-code"/></svg>
+            <h3 data-i18n="how.s1.t">Create a session</h3>
+            <p data-i18n="how.s1.p">Your backend calls one endpoint with the verification mode and your own reference id. You get back a unique link.</p>
+          </li>
+          <li class="step">
+            <span class="step-num" aria-hidden="true">2</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>
+            <h3 data-i18n="how.s2.t">Your user verifies</h3>
+            <p data-i18n="how.s2.p">They open the link on their phone, photograph the document and, in selfie mode, take a live selfie. No app to install, no front-end work for you.</p>
+          </li>
+          <li class="step">
+            <span class="step-num" aria-hidden="true">3</span>
+            <svg class="icon" aria-hidden="true"><use href="#i-hook"/></svg>
+            <h3 data-i18n="how.s3.t">Receive a signed decision</h3>
+            <p data-i18n="how.s3.p">A webhook arrives with approved, declined or review, machine-readable reasons and 0..1 scores. Or poll the session whenever you like.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- MODES -->
+    <section class="section section-alt" id="modes" aria-labelledby="modes-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="modes.eyebrow">Verification modes</p>
+          <h2 id="modes-h" data-i18n="modes.title">Pick the level of assurance you need</h2>
+          <p class="sub" data-i18n="modes.sub">Two modes, one API. Supported documents: passport, national ID card and driver licence.</p>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-doc"/></svg></div>
+            <h3 data-i18n="modes.doc.t">Document check</h3>
+            <p class="muted" data-i18n="modes.doc.p">One photo of the document. Fast, low friction, ideal as a first gate.</p>
+            <ul class="ticks">
+              <li data-i18n="modes.doc.l1">Data extraction: name, date of birth, document number, nationality, expiry</li>
+              <li data-i18n="modes.doc.l2">MRZ checksum validation for passports and ID cards with an MRZ</li>
+              <li data-i18n="modes.doc.l3">Tamper signals: screen captures, prints and edited documents</li>
+              <li data-i18n="modes.doc.l4">Optional match against the name you expect</li>
+            </ul>
+          </article>
+          <article class="card card-featured">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-face"/></svg></div>
+            <h3 data-i18n="modes.sd.t">Selfie + Document</h3>
+            <p class="muted" data-i18n="modes.sd.p">Everything in the document check, plus proof that the person holding the phone is the person on the document.</p>
+            <ul class="ticks">
+              <li data-i18n="modes.sd.l1">Face match between the document photo and a live selfie</li>
+              <li data-i18n="modes.sd.l2">Passive liveness: anti-spoofing against printed photos and screen replays</li>
+              <li data-i18n="modes.sd.l3">No head-turn or video required from the user</li>
+              <li data-i18n="modes.sd.l4">All document-check signals included</li>
+            </ul>
+          </article>
+        </div>
+        <p class="note" data-i18n="modes.note">Result in seconds for documents with an MRZ. PilotKYC reads the front side or data page of the document.</p>
+      </div>
+    </section>
+
+    <!-- INTEGRATION STYLES -->
+    <section class="section" id="integration" aria-labelledby="int-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="int.eyebrow">Integration</p>
+          <h2 id="int-h" data-i18n="int.title">Two ways to plug in. Use either, or both.</h2>
+        </div>
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-link"/></svg></div>
+            <h3 data-i18n="int.hosted.t">Hosted verification link</h3>
+            <p class="muted" data-i18n="int.hosted.p">Zero front-end work. Create a session, send the link, wait for the signed webhook.</p>
+            <ul class="ticks">
+              <li data-i18n="int.hosted.l1">Mobile-first page in English, Russian, Thai, Vietnamese, Portuguese, Spanish and Chinese</li>
+              <li data-i18n="int.hosted.l2">Redirect your user back to your app when done</li>
+              <li data-i18n="int.hosted.l3">Statuses: created, in progress, processing, approved, declined, review, expired, canceled</li>
+            </ul>
+          </article>
+          <article class="card">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-code"/></svg></div>
+            <h3 data-i18n="int.direct.t">Direct API</h3>
+            <p class="muted" data-i18n="int.direct.p">Already have your own capture screens? Upload the images and get the answer in the same response.</p>
+            <ul class="ticks">
+              <li data-i18n="int.direct.l1">One multipart request, synchronous result</li>
+              <li data-i18n="int.direct.l2">JPEG, PNG, WebP or HEIC, up to 10 MB each</li>
+              <li data-i18n="int.direct.l3">Same result object as the hosted flow</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section class="section section-alt" id="security" aria-labelledby="sec-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="sec.eyebrow">Security &amp; privacy</p>
+          <h2 id="sec-h" data-i18n="sec.title">Privacy by design, not as an add-on</h2>
+          <p class="sub" data-i18n="sec.sub">The best way to protect personal data is to not keep it. PilotKYC keeps as little as possible, for as short as possible.</p>
+        </div>
+        <div class="grid-3">
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg>
+            <h3 data-i18n="sec.f1.t">Images deleted right after the check</h3>
+            <p data-i18n="sec.f1.p">Photos are processed and removed as soon as the check ends. They are never written to a database.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>
+            <h3 data-i18n="sec.f2.t">Short retention, erasable on demand</h3>
+            <p data-i18n="sec.f2.p">Extracted personal data is kept at most 30 days by default, and you can erase it through the API at any time.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-hook"/></svg>
+            <h3 data-i18n="sec.f3.t">Signed webhooks</h3>
+            <p data-i18n="sec.f3.p">Every webhook carries an HMAC-SHA256 signature with a timestamp, so you can reject forgeries and replays.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-key"/></svg>
+            <h3 data-i18n="sec.f4.t">Keys stored as hashes</h3>
+            <p data-i18n="sec.f4.p">API keys are stored only as hashes. The plaintext is shown once, at creation. Keys are server-side only.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>
+            <h3 data-i18n="sec.f5.t">Safe failure mode</h3>
+            <p data-i18n="sec.f5.p">If recognition fails or times out, the result is review with a reason code. A technical error is never turned into an approval.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-face"/></svg>
+            <h3 data-i18n="sec.f6.t">Nothing leaks to the browser</h3>
+            <p data-i18n="sec.f6.p">The hosted page never shows the decision, scores or extracted data to the browser. Only your server learns the outcome.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEVELOPERS -->
+    <section class="section" id="developers" aria-labelledby="dev-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="dev.eyebrow">Developer experience</p>
+          <h2 id="dev-h" data-i18n="dev.title">Built to be integrated in an afternoon</h2>
+          <p class="sub" data-i18n="dev.sub">A small, predictable REST API with the details that matter in production.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-hook"/></svg></div>
+            <h3 data-i18n="dev.c1.t">Verifiable webhooks</h3>
+            <p class="muted" data-i18n="dev.c1.p">Check the signature on the raw body, with a 5-minute tolerance and a constant-time compare. Failed deliveries are retried up to 8 times.</p>
+<pre class="mini"><code>PilotKYC-Signature:
+  t=&lt;unix_ts&gt;,v1=&lt;hex&gt;
+
+v1 = HMAC_SHA256(
+  webhook_secret,
+  t + "." + raw_body)</code></pre>
+          </article>
+          <article class="card">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-swap"/></svg></div>
+            <h3 data-i18n="dev.c2.t">Idempotency built in</h3>
+            <p class="muted" data-i18n="dev.c2.p">Send an Idempotency-Key when creating sessions or checks. Retries within 24 hours replay the original response instead of creating duplicates.</p>
+<pre class="mini"><code>Idempotency-Key: order-1842-kyc
+
+&rarr; Idempotent-Replayed: true</code></pre>
+          </article>
+          <article class="card">
+            <div class="card-icon"><svg aria-hidden="true"><use href="#i-flask"/></svg></div>
+            <h3 data-i18n="dev.c3.t">Free deterministic sandbox</h3>
+            <p class="muted" data-i18n="dev.c3.p">Use a pk_test_ key and choose the outcome with a keyword in the expected name. No recognition runs and no image is stored.</p>
+<pre class="mini"><code>DECLINE    &rarr; declined
+REVIEW     &rarr; review
+UNREADABLE &rarr; declined
+other      &rarr; approved</code></pre>
+          </article>
+        </div>
+        <p class="note"><a href="docs/#/quickstart" data-i18n="dev.link">Start with the quickstart</a> &middot; <a href="openapi.yaml" data-i18n="dev.link2">OpenAPI specification</a></p>
+      </div>
+    </section>
+
+    <!-- USE CASES -->
+    <section class="section section-alt" id="use-cases" aria-labelledby="uc-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="uc.eyebrow">Use cases</p>
+          <h2 id="uc-h" data-i18n="uc.title">Wherever you need to know who is on the other side</h2>
+        </div>
+        <div class="grid-4">
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-swap"/></svg>
+            <h3 data-i18n="uc.u1.t">Crypto exchanges</h3>
+            <p data-i18n="uc.u1.p">Onboard users with a document and face check before they trade or withdraw.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>
+            <h3 data-i18n="uc.u2.t">P2P merchants</h3>
+            <p data-i18n="uc.u2.p">Confirm a counterparty is the person named on the order before releasing funds.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-wallet"/></svg>
+            <h3 data-i18n="uc.u3.t">Fintech and wallets</h3>
+            <p data-i18n="uc.u3.p">Add a verification step to account opening and limit upgrades.</p>
+          </article>
+          <article class="feature">
+            <svg class="icon" aria-hidden="true"><use href="#i-store"/></svg>
+            <h3 data-i18n="uc.u4.t">Marketplaces</h3>
+            <p data-i18n="uc.u4.p">Build trust between buyers and sellers by verifying who they are.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARISON -->
+    <section class="section" id="why" aria-labelledby="why-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="why.eyebrow">Why PilotKYC</p>
+          <h2 id="why-h" data-i18n="why.title">PilotKYC vs typical KYC providers</h2>
+          <p class="sub" data-i18n="why.sub">What we deliberately do differently.</p>
+        </div>
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr><th scope="col" data-i18n="why.th1">Area</th><th scope="col" data-i18n="why.th2">With PilotKYC</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row" data-i18n="why.r1.a">Your users' photos</th><td data-i18n="why.r1.b">Processed and deleted right after the check, never stored in a database.</td></tr>
+              <tr><th scope="row" data-i18n="why.r2.a">Personal data</th><td data-i18n="why.r2.b">Short default retention, with a one-call erase through the API.</td></tr>
+              <tr><th scope="row" data-i18n="why.r3.a">Getting started</th><td data-i18n="why.r3.b">Free sandbox keys with predictable outcomes, so you can test every branch before launch.</td></tr>
+              <tr><th scope="row" data-i18n="why.r4.a">Integration effort</th><td data-i18n="why.r4.b">A hosted link needs no front-end work. A direct API is there when you want full control.</td></tr>
+              <tr><th scope="row" data-i18n="why.r5.a">Decisions</th><td data-i18n="why.r5.b">Machine-readable reasons and 0..1 scores, not a black-box yes or no.</td></tr>
+              <tr><th scope="row" data-i18n="why.r6.a">Pricing</th><td data-i18n="why.r6.b">One simple per-verification price, pay as you go.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="section section-alt" id="pricing" aria-labelledby="pr-h">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="pr.eyebrow">Pricing</p>
+          <h2 id="pr-h" data-i18n="pr.title">Simple, pay-as-you-go pricing</h2>
+        </div>
+        <div class="grid-3 pricing">
+          <article class="card price-card">
+            <h3 data-i18n="pr.sb.t">Sandbox</h3>
+            <p class="price"><span data-price="sandbox">Free</span></p>
+            <p class="muted" data-i18n="pr.sb.p">Build and test your integration.</p>
+            <ul class="ticks">
+              <li data-i18n="pr.sb.l1">pk_test_ keys</li>
+              <li data-i18n="pr.sb.l2">Deterministic outcomes</li>
+              <li data-i18n="pr.sb.l3">No images stored</li>
+            </ul>
+            <a class="btn btn-secondary" href="docs/#/quickstart" data-i18n="pr.sb.cta">Try the sandbox</a>
+          </article>
+          <article class="card price-card card-featured">
+            <h3 data-i18n="pr.pr.t">Production</h3>
+            <p class="price"><span data-price="production">$0.05</span> <small data-i18n="pr.pr.unit">per verification</small></p>
+            <p class="muted" data-i18n="pr.pr.p">Real recognition, pay as you go.</p>
+            <ul class="ticks">
+              <li data-i18n="pr.pr.l1">Both modes included</li>
+              <li data-i18n="pr.pr.l2">Hosted link and direct API</li>
+              <li data-i18n="pr.pr.l3">Signed webhooks</li>
+            </ul>
+            <a class="btn btn-primary" href="https://t.me/pilotbotnet" data-contact data-i18n="cta.keys" rel="noopener">Get API keys</a>
+          </article>
+          <article class="card price-card">
+            <h3 data-i18n="pr.vo.t">Volume</h3>
+            <p class="price"><span data-i18n="pr.vo.price">Let's talk</span></p>
+            <p class="muted" data-i18n="pr.vo.p">High volumes or special requirements.</p>
+            <ul class="ticks">
+              <li data-i18n="pr.vo.l1">Volume pricing</li>
+              <li data-i18n="pr.vo.l2">Rate limit discussion</li>
+            </ul>
+            <a class="btn btn-secondary" href="https://t.me/pilotbotnet" data-contact data-i18n="pr.vo.cta" rel="noopener">Contact us</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq" aria-labelledby="faq-h">
+      <div class="wrap wrap-narrow">
+        <div class="section-head">
+          <p class="eyebrow" data-i18n="faq.eyebrow">FAQ</p>
+          <h2 id="faq-h" data-i18n="faq.title">Frequently asked questions</h2>
+        </div>
+        <div class="faq">
+          <details>
+            <summary data-i18n="faq.q1">Which documents are supported?</summary>
+            <p data-i18n="faq.a1">Passports, national ID cards and driver licences. PilotKYC reads the front side or the data page of the document.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q2">How fast is a result?</summary>
+            <p data-i18n="faq.a2">Seconds for documents with an MRZ. You are notified by webhook as soon as the decision is ready, or you can poll the session.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q3">Do you store my users' photos?</summary>
+            <p data-i18n="faq.a3">No. Images are processed and deleted right after the check and are never written to a database. Extracted personal data is kept at most 30 days by default and can be erased through the API at any time.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q4">What does review mean?</summary>
+            <p data-i18n="faq.a4">No hard failure was found, but at least one signal was not strong enough to approve automatically. You decide: queue it for a human, or ask the user to try again. Reason codes tell you why.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q5">Can I try it for free?</summary>
+            <p data-i18n="faq.a5">Yes. Sandbox keys are free and return deterministic outcomes, so you can build and test the full flow, including webhooks.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q6">Do you do AML or sanctions screening?</summary>
+            <p data-i18n="faq.a6">Not in v1. PilotKYC verifies a document and, optionally, a face. AML and sanctions screening, proof of address and KYB are on the roadmap, with no committed dates.</p>
+          </details>
+          <details>
+            <summary data-i18n="faq.q7">How do I get API keys?</summary>
+            <p><span data-i18n="faq.a7">Message us and we will issue sandbox and production keys together with your webhook secret.</span> <a href="https://t.me/pilotbotnet" data-contact data-i18n="faq.a7l" rel="noopener">Contact us</a></p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="cta-band" aria-labelledby="cta-h">
+      <div class="wrap cta-inner">
+        <h2 id="cta-h" data-i18n="final.title">Ready to verify your first user?</h2>
+        <p data-i18n="final.p">Get sandbox keys, create a session and see a signed webhook arrive in minutes.</p>
+        <div class="cta-row cta-center">
+          <a class="btn btn-light" href="docs/#/quickstart" data-i18n="final.cta1">Open the quickstart</a>
+          <a class="btn btn-ghost" href="https://t.me/pilotbotnet" data-contact data-i18n="cta.keys" rel="noopener">Get API keys</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <a class="logo" href="#top" aria-label="PilotKYC"><svg class="logo-mark" aria-hidden="true"><use href="#i-logo"/></svg><span>PilotKYC</span></a>
+        <p class="muted" data-i18n="footer.tag">Identity verification API for exchanges, P2P merchants, fintech and marketplaces.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="docs/" data-i18n="nav.docs">Docs</a>
+        <a href="docs/#/api-reference" data-i18n="footer.api">API reference</a>
+        <a href="openapi.yaml" data-i18n="footer.openapi">OpenAPI</a>
+        <a href="docs/#/changelog" data-i18n="footer.changelog">Changelog</a>
+        <a href="https://t.me/pilotbotnet" data-contact data-i18n="footer.contact" rel="noopener">Contact</a>
+      </nav>
+    </div>
+    <div class="wrap footer-bottom"><small>&copy; <span id="year">2026</span> PilotKYC</small></div>
+  </footer>
+
+  <noscript><style>.menu-btn{display:none}.nav{display:flex!important}</style></noscript>
+  <script src="assets/site-config.js"></script>
+  <script src="assets/landing.js"></script>
+</body>
+</html>

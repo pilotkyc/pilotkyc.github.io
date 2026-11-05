@@ -1,0 +1,843 @@
+openapi: 3.1.0
+info:
+  title: PilotKYC API
+  version: "1.0.0"
+  summary: Identity verification as a service (document, or document + selfie).
+  description: |
+    PilotKYC verifies an identity document and, optionally, a live selfie
+    (face match and passive liveness). Two integration styles, usable together:
+
+    1. **Hosted flow** - your backend creates a *session*, sends the returned `url`
+       to the user, and receives a signed webhook (and/or polls the session).
+    2. **Direct API** - you capture the images yourself and upload them to
+       `POST /v1/checks`; the answer is synchronous.
+
+    ## Authentication
+    `Authorization: Bearer <api_key>` on every `/v1/*` call. Server-to-server only.
+    `pk_live_...` keys run the real engine; `pk_test_...` keys are the sandbox.
+    Keys are shown once at creation and stored only as SHA-256 hashes.
+
+    ## Sandbox (`pk_test_` keys)
+    No engine call, no image is kept. The outcome is chosen by `expected_name`
+    (or by `reference_id` when no name is given), case-insensitive, first match wins:
+
+    | contains     | result                                          |
+    |--------------|-------------------------------------------------|
+    | `DECLINE`    | `declined`, reasons `["face_mismatch"]` (selfie_document) or `["document_suspicious"]` (document) |
+    | `REVIEW`     | `review`, reasons `["low_document_quality"]`    |
+    | `UNREADABLE` | `declined`, reasons `["document_unreadable"]`   |
+    | anything else| `approved` with fixed sample document data      |
+
+    Live and test objects are fully separate: a test key never sees live sessions and vice versa.
+
+    ## Idempotency
+    `POST /v1/sessions` and `POST /v1/checks` accept `Idempotency-Key` (max 255 chars).
+    Same key + same request within 24 h replays the original resource (response header
+    `Idempotent-Replayed: true`, body is the resource's current state). Same key +
+    different request: `409 conflict`.
+
+    ## Errors
+    Every error uses one envelope and every response carries `X-Request-Id`.
+
+    ```json
+    {"error": {"code": "invalid_request", "message": "human readable", "param": "mode"}}
+    ```
+
+    ## Rate limits
+    Per API key: 30 req/s in general, 10 req/s for `POST /v1/checks`. Exceeded: `429`
+    with `Retry-After`. Hosted-page endpoints: 60 requests/minute per client IP.
+
+    ## Webhooks
+    Sent to the session's `callback_url` (or the tenant default) as `POST` JSON.
+    Header `PilotKYC-Signature: t=<unix_ts>,v1=<hex HMAC-SHA256(webhook_secret, "<t>.<raw_body>")>`.
+    Reject timestamps older than 5 minutes. Up to 8 attempts with exponential backoff
+    (10 s, 30 s, 2 min, 10 min, 30 min, 1 h, 6 h) until a 2xx answer; every attempt is logged.
+    Callback URLs must be https and resolve to public addresses; redirects are not followed.
+    Events are not guaranteed to arrive in order: use `data.status` / poll the session.
+
+    ## Privacy
+    Images are never stored in the database; they live in memory for the duration of a
+    check (15 minutes at most) and are deleted when the engine has answered. Extracted
+    personal data is erased after `PII_RETENTION_DAYS` (default 30) or on request via
+    `DELETE .../data`. Scores, decision and reasons are kept for audit.
+  license:
+    name: Proprietary
+servers:
+  - url: https://kyc-api.pilotbot.net
+    description: Production (configurable via PUBLIC_BASE_URL)
+tags:
+  - name: Sessions
+    description: Hosted verification flow.
+  - name: Checks
+    description: Direct, synchronous verification with your own capture UI.
+  - name: Health
+  - name: Hosted page (internal)
+    description: |
+      Endpoints used by the capture page itself. **Not part of the partner API**: no API key,
+      the unguessable session id is the capability, and nothing here ever returns the decision,
+      scores or extracted data. Rate limit 60 requests/minute per client IP.
+security:
+  - bearerAuth: []
+
+paths:
+  /v1/sessions:
+    post:
+      tags: [Sessions]
+      operationId: createSession
+      summary: Create a hosted verification session
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+            example:
+              mode: selfie_document
+              reference_id: user-1842
+              expected_name: Nguyen Van A
+              callback_url: https://partner.example/webhooks/kyc
+              redirect_url: https://partner.example/kyc/done
+              language: vi
+              expires_in: 86400
+              metadata: {order: "7731"}
+              document_type: passport
+      responses:
+        "201":
+          description: Session created (also returned, with status 201, when an idempotent request is replayed).
+          headers:
+            X-Request-Id: {$ref: "#/components/headers/XRequestId"}
+            Idempotent-Replayed: {$ref: "#/components/headers/IdempotentReplayed"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Session"}
+              example:
+                id: ses_2b9f6c0e8d1a4f37b5c2a9e04d718f3a6c5b0e92d4a7183f6e5c9b2a0d4f8e17
+                object: session
+                livemode: true
+                mode: selfie_document
+                status: created
+                url: https://kyc-api.pilotbot.net/s/ses_2b9f6c0e8d1a4f37b5c2a9e04d718f3a6c5b0e92d4a7183f6e5c9b2a0d4f8e17
+                reference_id: user-1842
+                metadata: {order: "7731"}
+                decision: null
+                reasons: []
+                document: null
+                scores: {document_authenticity: null, name_match: null, face_match: null, liveness: null}
+                expected_name: Nguyen Van A
+                data_erased: false
+                created_at: "2026-11-05T07:00:00Z"
+                completed_at: null
+                expires_at: "2026-11-06T07:00:00Z"
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "413": {$ref: "#/components/responses/PayloadTooLarge"}
+        "415": {$ref: "#/components/responses/UnsupportedMediaType"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+    get:
+      tags: [Sessions]
+      operationId: listSessions
+      summary: List sessions (newest first)
+      parameters:
+        - {name: reference_id, in: query, schema: {type: string, maxLength: 128}}
+        - {name: status, in: query, schema: {$ref: "#/components/schemas/SessionStatus"}}
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 10}}
+        - name: starting_after
+          in: query
+          description: Session id; returns the page after it.
+          schema: {type: string}
+      responses:
+        "200":
+          description: A page of sessions.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, has_more]
+                properties:
+                  data:
+                    type: array
+                    items: {$ref: "#/components/schemas/Session"}
+                  has_more: {type: boolean}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+  /v1/sessions/{id}:
+    get:
+      tags: [Sessions]
+      operationId: getSession
+      summary: Retrieve a session
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "200":
+          description: The session.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Session"}
+              example:
+                id: ses_2b9f6c0e8d1a4f37b5c2a9e04d718f3a6c5b0e92d4a7183f6e5c9b2a0d4f8e17
+                object: session
+                livemode: true
+                mode: selfie_document
+                status: approved
+                url: https://kyc-api.pilotbot.net/s/ses_2b9f6c0e8d1a4f37b5c2a9e04d718f3a6c5b0e92d4a7183f6e5c9b2a0d4f8e17
+                reference_id: user-1842
+                metadata: {}
+                decision: approved
+                reasons: []
+                document:
+                  name: NGUYEN VAN A
+                  date_of_birth: "1990-04-12"
+                  document_number: C1234567
+                  nationality: VNM
+                  expiry_date: "2031-02-03"
+                  mrz_checked: true
+                scores: {document_authenticity: 0.86, name_match: 0.97, face_match: 0.81, liveness: 0.9}
+                expected_name: Nguyen Van A
+                data_erased: false
+                created_at: "2026-11-05T07:00:00Z"
+                completed_at: "2026-11-05T07:01:12Z"
+                expires_at: "2026-11-06T07:00:00Z"
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+  /v1/sessions/{id}/cancel:
+    post:
+      tags: [Sessions]
+      operationId: cancelSession
+      summary: Cancel a session that has not been opened yet
+      description: Only possible from status `created`. Emits `session.canceled`.
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "200":
+          description: The canceled session.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Session"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+
+  /v1/sessions/{id}/data:
+    delete:
+      tags: [Sessions]
+      operationId: eraseSessionData
+      summary: Erase personal data of a finished session
+      description: |
+        Nulls `document` and `expected_name`, the consent IP / user agent and stored webhook
+        payloads. Scores, decision and reasons stay. Idempotent. `409` while the session is not finished.
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "200":
+          description: "The session with `data_erased: true`."
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Session"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+
+  /v1/sessions/{id}/webhooks/resend:
+    post:
+      tags: [Sessions]
+      operationId: resendWebhook
+      summary: Re-send the last webhook event of a session
+      description: Re-queues the most recent event with the same event id, so receivers can de-duplicate.
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "202":
+          description: Queued.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [event_id, type, status]
+                properties:
+                  event_id: {type: string, examples: [evt_9c1f0a2b3d4e5f60718293a4b5c6d7e8]}
+                  type: {$ref: "#/components/schemas/WebhookEventType"}
+                  status: {type: string, const: queued}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404": {$ref: "#/components/responses/NotFound"}
+
+  /v1/checks:
+    post:
+      tags: [Checks]
+      operationId: createCheck
+      summary: Verify uploaded images synchronously
+      description: |
+        Runs the full check and answers when it is done (can take up to a few minutes).
+        If the engine times out or fails, the result is `review` with reason `engine_error`
+        (never `approved`). `503 engine_unavailable` means the gateway is over capacity and
+        nothing was created: retry after `Retry-After`.
+        JPEG, PNG, WebP or HEIC (checked by content), max 10 MB per file.
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [mode, document]
+              properties:
+                mode: {$ref: "#/components/schemas/Mode"}
+                document:
+                  type: string
+                  contentMediaType: image/*
+                  description: Passport data page or front side of an ID.
+                document_type: {$ref: "#/components/schemas/DocumentType"}
+                selfie:
+                  type: string
+                  contentMediaType: image/*
+                  description: Required when `mode` is `selfie_document`.
+                expected_name: {type: string, maxLength: 200}
+                reference_id: {type: string, maxLength: 128}
+      responses:
+        "200":
+          description: The finished check (also returned when an idempotent request is replayed).
+          headers:
+            X-Request-Id: {$ref: "#/components/headers/XRequestId"}
+            Idempotent-Replayed: {$ref: "#/components/headers/IdempotentReplayed"}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Check"}
+              example:
+                id: chk_7a41d0c9e2b84f65a3d1c07e9b2f4a68d5c3e1f0a9b8c7d6e5f4a3b2c1d0e9f8
+                object: check
+                livemode: true
+                mode: selfie_document
+                status: declined
+                reference_id: user-1842
+                metadata: {}
+                decision: declined
+                reasons: [face_mismatch]
+                document:
+                  name: NGUYEN VAN A
+                  date_of_birth: "1990-04-12"
+                  document_number: C1234567
+                  nationality: VNM
+                  expiry_date: "2031-02-03"
+                  mrz_checked: true
+                scores: {document_authenticity: 0.86, name_match: 0.97, face_match: 0.02, liveness: 0.9}
+                expected_name: Nguyen Van A
+                data_erased: false
+                created_at: "2026-11-05T07:00:00Z"
+                completed_at: "2026-11-05T07:00:41Z"
+                expires_at: null
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "413": {$ref: "#/components/responses/PayloadTooLarge"}
+        "415": {$ref: "#/components/responses/UnsupportedMediaType"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "503":
+          description: Over capacity; nothing was created.
+          headers:
+            Retry-After: {schema: {type: integer}}
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Error"}
+              example: {error: {code: engine_unavailable, message: "Verification capacity is exhausted, retry shortly."}}
+
+  /v1/checks/{id}:
+    get:
+      tags: [Checks]
+      operationId: getCheck
+      summary: Retrieve a check
+      description: Personal data is subject to retention.
+      parameters: [{$ref: "#/components/parameters/CheckId"}]
+      responses:
+        "200":
+          description: The check.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Check"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+  /v1/checks/{id}/data:
+    delete:
+      tags: [Checks]
+      operationId: eraseCheckData
+      summary: Erase personal data of a check
+      description: Same semantics as the session endpoint (extension to SPEC v1).
+      parameters: [{$ref: "#/components/parameters/CheckId"}]
+      responses:
+        "200":
+          description: "The check with `data_erased: true`."
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Check"}
+        "401": {$ref: "#/components/responses/Unauthorized"}
+        "404": {$ref: "#/components/responses/NotFound"}
+
+  /healthz:
+    get:
+      tags: [Health]
+      operationId: healthz
+      summary: Liveness / dependency health
+      description: "`503` only when the database is down; an unreachable engine reports `degraded` with `200`."
+      security: []
+      responses:
+        "200":
+          description: Healthy or degraded.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Health"}
+              example: {status: ok, version: "1.0.0", db: true, engine: true}
+        "503":
+          description: Database unreachable.
+          content:
+            application/json:
+              schema: {$ref: "#/components/schemas/Health"}
+
+  /s/{id}:
+    get:
+      tags: [Hosted page (internal)]
+      operationId: hostedPage
+      summary: The capture page (static HTML)
+      description: Static files are served from `/s/assets/*`.
+      security: []
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "200":
+          description: HTML.
+          content:
+            text/html: {schema: {type: string}}
+        "404": {$ref: "#/components/responses/NotFound"}
+
+  /s/{id}/config:
+    get:
+      tags: [Hosted page (internal)]
+      operationId: hostedConfig
+      summary: Page configuration
+      security: []
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "200":
+          description: Configuration for the page.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [mode, language, status, sandbox, expires_at, document_type]
+                properties:
+                  mode: {$ref: "#/components/schemas/Mode"}
+                  language: {$ref: "#/components/schemas/Language"}
+                  status:
+                    type: string
+                    enum: [created, in_progress]
+                  sandbox: {type: boolean}
+                  expires_at: {type: string, format: date-time}
+                  document_type:
+                    oneOf: [{$ref: "#/components/schemas/DocumentType"}, {type: "null"}]
+        "404": {$ref: "#/components/responses/NotFound"}
+        "410": {$ref: "#/components/responses/Gone"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+  /s/{id}/start:
+    post:
+      tags: [Hosted page (internal)]
+      operationId: hostedStart
+      summary: Record consent and open the session
+      description: |
+        Moves `created` to `in_progress` and records consent time, IP and user agent.
+        **Idempotent**: calling it again on a session that is already `in_progress` returns `200`
+        and changes nothing (the consent timestamp is not overwritten).
+      security: []
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consent]
+              additionalProperties: false
+              properties:
+                consent: {type: boolean, const: true}
+      responses:
+        "200":
+          description: Session is in progress.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: {type: string, const: in_progress}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "410": {$ref: "#/components/responses/Gone"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+  /s/{id}/precheck:
+    post:
+      tags: [Hosted page (internal)]
+      operationId: hostedPrecheck
+      summary: Fast readability gate for the document photo
+      description: |
+        UX gate only; the authoritative check runs at submit. Max 20 calls per session (`429` after).
+        Sandbox sessions always answer readable. If the engine is unreachable the answer is
+        `{"readable": true, "reason": "precheck_unavailable"}`. Requires `in_progress` (`409` otherwise).
+      security: []
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [document]
+              properties:
+                document: {type: string, contentMediaType: image/*}
+      responses:
+        "200":
+          description: Readability verdict.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [readable, reason]
+                properties:
+                  readable: {type: boolean}
+                  reason:
+                    type: string
+                    description: "`ok`, `no_document_detected`, `too_large`, `unsupported_format`, `precheck_unavailable`, ..."
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "410": {$ref: "#/components/responses/Gone"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+  /s/{id}/submit:
+    post:
+      tags: [Hosted page (internal)]
+      operationId: hostedSubmit
+      summary: Submit the captured images (single use)
+      description: |
+        Requires `in_progress`. A second submit, or a submit after the session finished, answers `409`.
+        Invalid files (`400`/`413`/`415`) do not consume the single use. `503` when over capacity.
+      security: []
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [document]
+              properties:
+                document: {type: string, contentMediaType: image/*}
+                selfie:
+                  type: string
+                  contentMediaType: image/*
+                  description: Required for `selfie_document` sessions.
+                document_type: {$ref: "#/components/schemas/DocumentType"}
+      responses:
+        "202":
+          description: Processing started.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: {type: string, const: processing}
+        "400": {$ref: "#/components/responses/InvalidRequest"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "409": {$ref: "#/components/responses/Conflict"}
+        "410": {$ref: "#/components/responses/Gone"}
+        "413": {$ref: "#/components/responses/PayloadTooLarge"}
+        "415": {$ref: "#/components/responses/UnsupportedMediaType"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+        "503": {description: Over capacity; the session stays open, retry shortly.}
+
+  /s/{id}/status:
+    get:
+      tags: [Hosted page (internal)]
+      operationId: hostedStatus
+      summary: Poll processing state (never reveals the decision)
+      security: []
+      parameters: [{$ref: "#/components/parameters/SessionId"}]
+      responses:
+        "200":
+          description: |
+            `done` for any decision (approved, declined or review - which one is never disclosed),
+            `expired` for expired or canceled sessions, `processing` otherwise.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, redirect_url]
+                properties:
+                  status: {type: string, enum: [processing, done, expired]}
+                  redirect_url:
+                    type: [string, "null"]
+                    description: Only set when `status` is `done` or `expired`.
+        "404": {$ref: "#/components/responses/NotFound"}
+        "429": {$ref: "#/components/responses/RateLimited"}
+
+webhooks:
+  sessionEvent:
+    post:
+      summary: Session event delivered to your callback_url
+      description: |
+        Verify the `PilotKYC-Signature` header before trusting the body:
+        `t=<unix_ts>,v1=<hex>` where `v1 = HMAC_SHA256(webhook_secret, "<t>." + raw_body)`.
+        Reject if `|now - t| > 300 s`. Answer any 2xx to acknowledge.
+      security: []
+      parameters:
+        - name: PilotKYC-Signature
+          in: header
+          required: true
+          schema: {type: string, examples: ["t=1793862000,v1=5257a869e7ecebeda32affa62cdca3fa51cad7e77a0e56ff536d0ce8e108d8bd"]}
+        - name: PilotKYC-Event-Id
+          in: header
+          required: true
+          schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: "#/components/schemas/WebhookEvent"}
+            example:
+              id: evt_9c1f0a2b3d4e5f60718293a4b5c6d7e8
+              type: session.completed
+              created_at: "2026-11-05T07:01:12Z"
+              data:
+                id: ses_2b9f6c0e8d1a4f37b5c2a9e04d718f3a6c5b0e92d4a7183f6e5c9b2a0d4f8e17
+                object: session
+                status: approved
+                decision: approved
+      responses:
+        "200": {description: Acknowledged. Any 2xx stops retries.}
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "`pk_live_...` (production) or `pk_test_...` (sandbox) API key."
+  headers:
+    XRequestId:
+      description: Request correlation id (echoed when you send a valid `X-Request-Id`, otherwise generated).
+      schema: {type: string}
+    IdempotentReplayed:
+      description: Present with value `true` when the response is a replay.
+      schema: {type: string, const: "true"}
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema: {type: string, maxLength: 255}
+    SessionId:
+      name: id
+      in: path
+      required: true
+      schema: {type: string, pattern: "^ses_[0-9a-f]{64}$"}
+    CheckId:
+      name: id
+      in: path
+      required: true
+      schema: {type: string, pattern: "^chk_[0-9a-f]{64}$"}
+  responses:
+    InvalidRequest:
+      description: Validation failed (`param` names the field).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {error: {code: invalid_request, message: selfie file is required., param: selfie}}
+    Unauthorized:
+      description: Missing, unknown or revoked API key.
+      headers:
+        WWW-Authenticate: {schema: {type: string}}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {error: {code: unauthorized, message: "Missing, unknown or revoked API key."}}
+    NotFound:
+      description: Unknown id (or it belongs to another tenant / mode).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {error: {code: not_found, message: Session not found.}}
+    Conflict:
+      description: Idempotency-Key reuse with a different request, or the resource is in the wrong state.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {error: {code: conflict, message: Idempotency-Key was already used with a different request.}}
+    Gone:
+      description: |
+        The session can no longer be used. The body tells the page which screen to show:
+        `session_expired` / `session_canceled` / `session_submitted`, mirrored in the top-level `status`.
+        The decision is never disclosed.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [error, status]
+            properties:
+              error:
+                type: object
+                required: [code, message]
+                properties:
+                  code: {type: string, enum: [session_expired, session_canceled, session_submitted]}
+                  message: {type: string}
+              status: {type: string, enum: [expired, canceled, submitted]}
+          example: {error: {code: session_expired, message: This verification link has expired.}, status: expired}
+    PayloadTooLarge:
+      description: Body or file exceeds the limit (10 MB per file).
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+    UnsupportedMediaType:
+      description: Wrong Content-Type, or a file that is not a JPEG/PNG/WebP/HEIC image.
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+    RateLimited:
+      description: Too many requests.
+      headers:
+        Retry-After: {schema: {type: integer}}
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/Error"}
+          example: {error: {code: rate_limited, message: Too many requests.}}
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [invalid_request, unauthorized, forbidden, not_found, conflict, payload_too_large,
+                     unsupported_media_type, rate_limited, engine_unavailable, internal_error]
+            message: {type: string}
+            param: {type: string}
+    Mode:
+      type: string
+      enum: [document, selfie_document]
+    DocumentType:
+      type: string
+      enum: [passport, national_id, driver_license]
+    Language:
+      type: string
+      enum: [en, ru, th, vi, pt, es, zh]
+    Decision:
+      type: string
+      enum: [approved, declined, review]
+    SessionStatus:
+      type: string
+      enum: [created, in_progress, processing, approved, declined, review, expired, canceled]
+    ReasonCode:
+      type: string
+      enum: [document_not_found, document_unreadable, document_incomplete, document_suspicious,
+             document_expired, mrz_invalid, name_mismatch, face_not_found, face_mismatch,
+             liveness_failed, low_document_quality, low_face_match, low_liveness, engine_error]
+    WebhookEventType:
+      type: string
+      enum: [session.in_progress, session.completed, session.expired, session.canceled]
+    CreateSessionRequest:
+      type: object
+      required: [mode]
+      additionalProperties: false
+      properties:
+        mode: {$ref: "#/components/schemas/Mode"}
+        reference_id: {type: string, maxLength: 128, description: Your own user/order id, echoed back.}
+        expected_name: {type: string, maxLength: 200, description: Full name to compare with the document.}
+        callback_url: {type: string, format: uri, description: "https only; overrides the tenant default. Must resolve to public addresses."}
+        redirect_url: {type: string, format: uri, description: https URL the user is sent to after finishing.}
+        language: {$ref: "#/components/schemas/Language"}
+        expires_in: {type: integer, minimum: 300, maximum: 604800, default: 86400, description: Seconds.}
+        metadata:
+          type: object
+          maxProperties: 20
+          additionalProperties: {type: string, maxLength: 500}
+        document_type: {$ref: "#/components/schemas/DocumentType"}
+    Scores:
+      type: object
+      description: 0..1, higher is better; null means not applicable (or not computed yet).
+      properties:
+        document_authenticity: {type: [number, "null"], minimum: 0, maximum: 1}
+        name_match: {type: [number, "null"], minimum: 0, maximum: 1}
+        face_match: {type: [number, "null"], minimum: 0, maximum: 1}
+        liveness: {type: [number, "null"], minimum: 0, maximum: 1}
+    DocumentData:
+      type: [object, "null"]
+      description: Extracted personal data. Null while pending, when nothing could be read, and after erasure.
+      properties:
+        name: {type: [string, "null"]}
+        date_of_birth: {type: [string, "null"]}
+        document_number: {type: [string, "null"]}
+        nationality: {type: [string, "null"]}
+        expiry_date: {type: [string, "null"]}
+        mrz_checked:
+          type: boolean
+          description: True when a machine-readable zone was read and every check digit passed.
+    Result:
+      type: object
+      required: [id, object, livemode, mode, status, reference_id, metadata, decision, reasons, document,
+                 scores, expected_name, data_erased, created_at, completed_at, expires_at]
+      properties:
+        id: {type: string}
+        object: {type: string, enum: [session, check]}
+        livemode: {type: boolean}
+        mode: {$ref: "#/components/schemas/Mode"}
+        status: {$ref: "#/components/schemas/SessionStatus"}
+        reference_id: {type: [string, "null"]}
+        metadata: {type: object, additionalProperties: {type: string}}
+        decision:
+          oneOf: [{$ref: "#/components/schemas/Decision"}, {type: "null"}]
+          description: Null while pending. `declined` = at least one hard fail; `review` = no hard fail but a signal between the review and auto-pass thresholds, or an engine problem.
+        reasons:
+          type: array
+          items: {$ref: "#/components/schemas/ReasonCode"}
+          description: Empty when approved.
+        document: {$ref: "#/components/schemas/DocumentData"}
+        scores: {$ref: "#/components/schemas/Scores"}
+        expected_name: {type: [string, "null"]}
+        data_erased: {type: boolean}
+        created_at: {type: string, format: date-time}
+        completed_at: {type: [string, "null"], format: date-time}
+        expires_at: {type: [string, "null"], format: date-time}
+    Session:
+      allOf:
+        - $ref: "#/components/schemas/Result"
+        - type: object
+          required: [url]
+          properties:
+            object: {const: session}
+            url: {type: string, format: uri, description: Send this to your user.}
+    Check:
+      allOf:
+        - $ref: "#/components/schemas/Result"
+        - type: object
+          properties:
+            object: {const: check}
+    WebhookEvent:
+      type: object
+      required: [id, type, created_at, data]
+      properties:
+        id: {type: string, description: Stable across retries and resends.}
+        type: {$ref: "#/components/schemas/WebhookEventType"}
+        created_at: {type: string, format: date-time}
+        data: {$ref: "#/components/schemas/Session"}
+    Health:
+      type: object
+      required: [status, version, db, engine]
+      properties:
+        status: {type: string, enum: [ok, degraded]}
+        version: {type: string}
+        db: {type: boolean}
+        engine: {type: boolean}

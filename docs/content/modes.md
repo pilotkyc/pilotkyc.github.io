@@ -2,10 +2,10 @@
 
 The `mode` field selects what your user provides and what PilotKYC checks. It is required for both [sessions](#/hosted-sessions) and [direct checks](#/direct-checks).
 
-| `mode` | What the end user provides | What PilotKYC checks |
-|---|---|---|
-| `document` | Photo of an identity document | Document is present and readable, authenticity signals, data extraction, MRZ checksum when the document has one, optional match against the expected name |
-| `selfie_document` | Photo of the document **and** a live selfie | Everything from `document`, plus face match document ↔ selfie and passive liveness |
+| `mode` | Price | What the end user provides | What PilotKYC checks |
+|---|---|---|---|
+| `document` | **0.04 USDT** | Photo of an identity document | Document is present and readable, authenticity signals, data extraction, MRZ checksum when the document has one, optional match against the expected name |
+| `selfie_document` | **0.08 USDT** | Photo of the document **and** a live selfie | Everything from `document`, plus face match document ↔ selfie and passive liveness |
 
 ## `document`
 

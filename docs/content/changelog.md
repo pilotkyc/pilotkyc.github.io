@@ -3,9 +3,9 @@
 ## Self-serve accounts and billing
 
 - **Dashboard:** sign up, confirm your email, create and revoke API keys yourself, and manage your webhook and balance. No more asking for keys.
-- **Prepaid USDT balance:** top up with crypto via OxaPay (10 to 5000 USDT per top-up). Live verifications cost 0.05 USDT in both modes; sandbox stays free. See [Billing and balance](#/billing).
+- **Prepaid USDT balance:** top up with crypto via OxaPay (10 to 5000 USDT per top-up). Live verifications cost **0.04 USDT** for `document` and **0.08 USDT** for `selfie_document`; sandbox stays free. See [Billing and balance](#/billing).
 - **API:** new `price` field in results, and `402 insufficient_balance` (with `available` and `required`) on `POST /v1/sessions` and `POST /v1/checks`.
-- **Processing time:** documents with an MRZ take seconds; other documents, read by the AI, usually take from about 30 seconds up to 2 minutes.
+- **Processing time:** documents with an MRZ take seconds; other documents, read by the AI, usually take 10–30 seconds with automatic multi-endpoint failover.
 
 ## v1.0.0 — 2026-11-05
 

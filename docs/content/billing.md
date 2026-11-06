@@ -2,10 +2,10 @@
 
 PilotKYC is prepaid. You top up a balance in USDT, and every live verification is paid from it. There are no subscriptions and no monthly minimums.
 
-| | Price |
+| Mode | Price |
 |---|---|
-| `document` | **0.05 USDT** per verification |
-| `selfie_document` | **0.05 USDT** per verification |
+| `document` (Document check) | **0.04 USDT** per verification |
+| `selfie_document` (Selfie + Document) | **0.08 USDT** per verification |
 | Sandbox (`pk_test_` keys) | **Free** |
 
 The amount actually charged for a result is always shown in its [`price` field](#/billing/price-in-results).
@@ -57,10 +57,10 @@ Creating a session therefore needs the price to be available at that moment, eve
 Every [result object](#/result-object) of a live key carries a `price` field:
 
 ```json
-"price": { "amount": "0.050000", "currency": "USDT" }
+"price": { "amount": "0.080000", "currency": "USDT" }
 ```
 
-`amount` is a string with six decimals. While a session is waiting for your user, `price` shows the amount held for it. `price` is `null` when nothing is owed:
+`amount` is a string with six decimals (`"0.040000"` for `document`, `"0.080000"` for `selfie_document`). While a session is waiting for your user, `price` shows the amount held for it. `price` is `null` when nothing is owed:
 
 - sandbox results;
 - sessions whose hold was released (expired, canceled, closed after failed uploads);
@@ -77,9 +77,9 @@ When the available balance is lower than the price, `POST /v1/checks` and `POST 
 {
   "error": {
     "code": "insufficient_balance",
-    "message": "Insufficient balance: 0.020000 USDT available, 0.050000 USDT required. Top up to continue.",
+    "message": "Insufficient balance: 0.020000 USDT available, 0.080000 USDT required. Top up to continue.",
     "available": "0.020000",
-    "required": "0.050000"
+    "required": "0.080000"
   }
 }
 ```

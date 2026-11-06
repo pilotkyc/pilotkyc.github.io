@@ -23,7 +23,9 @@ window.PILOTKYC = {
   pricing: {
     currency: "",  // amounts are USDT; the unit is written next to the price
     sandbox: { free: true },
-    production: { amount: 0.05 },
+    document: { amount: 0.04 },
+    selfie_document: { amount: 0.08 },
+    production: { amount: 0.04 },
     volume: { contact: true }
   }
 };

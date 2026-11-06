@@ -127,7 +127,7 @@ paths:
                 document: null
                 scores: {document_authenticity: null, name_match: null, face_match: null, liveness: null}
                 expected_name: Nguyen Van A
-                price: {amount: "0.050000", currency: USDT}
+                price: {amount: "0.080000", currency: USDT}
                 data_erased: false
                 created_at: "2026-11-05T07:00:00Z"
                 completed_at: null
@@ -200,7 +200,7 @@ paths:
                   mrz_checked: true
                 scores: {document_authenticity: 0.86, name_match: 0.97, face_match: 0.81, liveness: 0.9}
                 expected_name: Nguyen Van A
-                price: {amount: "0.050000", currency: USDT}
+                price: {amount: "0.080000", currency: USDT}
                 data_erased: false
                 created_at: "2026-11-05T07:00:00Z"
                 completed_at: "2026-11-05T07:01:12Z"
@@ -328,7 +328,7 @@ paths:
                   mrz_checked: true
                 scores: {document_authenticity: 0.86, name_match: 0.97, face_match: 0.02, liveness: 0.9}
                 expected_name: Nguyen Van A
-                price: {amount: "0.050000", currency: USDT}
+                price: {amount: "0.080000", currency: USDT}
                 data_erased: false
                 created_at: "2026-11-05T07:00:00Z"
                 completed_at: "2026-11-05T07:00:41Z"
@@ -677,9 +677,9 @@ components:
           example:
             error:
               code: insufficient_balance
-              message: "Insufficient balance: 0.020000 USDT available, 0.050000 USDT required. Top up to continue."
+              message: "Insufficient balance: 0.020000 USDT available, 0.080000 USDT required. Top up to continue."
               available: "0.020000"
-              required: "0.050000"
+              required: "0.080000"
     NotFound:
       description: Unknown id (or it belongs to another tenant / mode).
       content:
@@ -812,7 +812,7 @@ components:
       type: object
       required: [amount, currency]
       properties:
-        amount: {type: string, example: "0.050000", description: "USDT, exactly 6 decimals."}
+        amount: {type: string, example: "0.040000", description: "USDT, exactly 6 decimals (0.040000 for document, 0.080000 for selfie_document)."}
         currency: {type: string, enum: [USDT]}
     Result:
       type: object

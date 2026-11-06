@@ -167,7 +167,10 @@
         </div>
         <div class="grid-2">
           <article class="card">
-            <div class="card-icon"><svg aria-hidden="true"><use href="#i-doc"/></svg></div>
+            <div class="mode-head">
+              <div class="card-icon"><svg aria-hidden="true"><use href="#i-doc"/></svg></div>
+              <span class="mode-price" data-i18n="modes.doc.price">0.04 USDT / check</span>
+            </div>
             <h3 data-i18n="modes.doc.t">Document check</h3>
             <p class="muted" data-i18n="modes.doc.p">One photo of the document. Fast, low friction, ideal as a first gate.</p>
             <ul class="ticks">
@@ -178,7 +181,10 @@
             </ul>
           </article>
           <article class="card card-featured">
-            <div class="card-icon"><svg aria-hidden="true"><use href="#i-face"/></svg></div>
+            <div class="mode-head">
+              <div class="card-icon"><svg aria-hidden="true"><use href="#i-face"/></svg></div>
+              <span class="mode-price mode-price-featured" data-i18n="modes.sd.price">0.08 USDT / check</span>
+            </div>
             <h3 data-i18n="modes.sd.t">Selfie + Document</h3>
             <p class="muted" data-i18n="modes.sd.p">Everything in the document check, plus proof that the person holding the phone is the person on the document.</p>
             <ul class="ticks">
@@ -189,7 +195,7 @@
             </ul>
           </article>
         </div>
-        <p class="note" data-i18n="modes.note">Result in seconds for documents with an MRZ. Other documents, read by the AI, usually take from about 30 seconds up to 2 minutes. PilotKYC reads the front side or data page of the document.</p>
+        <p class="note" data-i18n="modes.note">Result in 1–2 seconds for documents with a valid MRZ. Other documents read by the AI typically finish in 10–30 seconds with automatic failover. PilotKYC reads the front side or data page of the document.</p>
       </div>
     </section>
 
@@ -361,7 +367,7 @@ other      &rarr; approved</code></pre>
               <tr><th scope="row" data-i18n="why.r3.a">Getting started</th><td data-i18n="why.r3.b">Free sandbox keys with predictable outcomes, so you can test every branch before launch.</td></tr>
               <tr><th scope="row" data-i18n="why.r4.a">Integration effort</th><td data-i18n="why.r4.b">A hosted link needs no front-end work. A direct API is there when you want full control.</td></tr>
               <tr><th scope="row" data-i18n="why.r5.a">Decisions</th><td data-i18n="why.r5.b">Machine-readable reasons and 0..1 scores, not a black-box yes or no.</td></tr>
-              <tr><th scope="row" data-i18n="why.r6.a">Pricing</th><td data-i18n="why.r6.b">One simple per-verification price, pay as you go.</td></tr>
+              <tr><th scope="row" data-i18n="why.r6.a">Pricing</th><td data-i18n="why.r6.b">Transparent pay-as-you-go tiers: 0.04 USDT for Document check, 0.08 USDT for Selfie + Document.</td></tr>
             </tbody>
           </table>
         </div>
@@ -373,9 +379,10 @@ other      &rarr; approved</code></pre>
       <div class="wrap">
         <div class="section-head">
           <p class="eyebrow" data-i18n="pr.eyebrow">Pricing</p>
-          <h2 id="pr-h" data-i18n="pr.title">Simple, pay-as-you-go pricing</h2>
+          <h2 id="pr-h" data-i18n="pr.title">Transparent pay-as-you-go pricing by mode</h2>
+          <p class="sub" data-i18n="pr.sub">Prepaid USDT balance via OxaPay. No monthly minimums, no setup fees. Charged only when a decision is produced.</p>
         </div>
-        <div class="grid-3 pricing">
+        <div class="grid-4 pricing">
           <article class="card price-card">
             <h3 data-i18n="pr.sb.t">Sandbox</h3>
             <p class="price"><span data-price="sandbox">Free</span></p>
@@ -387,15 +394,33 @@ other      &rarr; approved</code></pre>
             </ul>
             <a class="btn btn-secondary" href="docs/#/quickstart" data-i18n="pr.sb.cta">Try the sandbox</a>
           </article>
-          <article class="card price-card card-featured">
-            <h3 data-i18n="pr.pr.t">Production</h3>
-            <p class="price"><span data-price="production">0.05</span> <small data-i18n="pr.pr.unit">USDT per verification</small></p>
-            <p class="muted" data-i18n="pr.pr.p">Real recognition from a prepaid USDT balance. Top up with crypto via OxaPay. You are charged only when a decision is produced.</p>
+          <article class="card price-card">
+            <div class="price-tier-head">
+              <h3 data-i18n="pr.doc.t">Document check</h3>
+              <code class="tier-badge">document</code>
+            </div>
+            <p class="price"><span data-price="document">0.04</span> <small data-i18n="pr.pr.unit">USDT per verification</small></p>
+            <p class="muted" data-i18n="pr.doc.p">Fast document OCR, MRZ validation and tamper detection without a selfie step.</p>
             <ul class="ticks">
-              <li data-i18n="pr.pr.l1">Prepaid balance, top-ups from 10 USDT</li>
-              <li data-i18n="pr.pr.l2">Same price in both modes</li>
-              <li data-i18n="pr.pr.l3">Refunded automatically if our engine fails</li>
-              <li data-i18n="pr.pr.l4">Hosted link, direct API and signed webhooks</li>
+              <li data-i18n="pr.doc.l1">Name, DOB, doc number, nationality &amp; expiry extraction</li>
+              <li data-i18n="pr.doc.l2">MRZ checksum &amp; screen/print tamper flags</li>
+              <li data-i18n="pr.doc.l3">Optional expected-name matching</li>
+              <li data-i18n="pr.doc.l4">Auto-refunded if our engine fails</li>
+            </ul>
+            <a class="btn btn-secondary" href="https://kyc.pilotbot.net/dashboard/signup" data-signup data-i18n="cta.keys" rel="noopener">Get API keys</a>
+          </article>
+          <article class="card price-card card-featured">
+            <div class="price-tier-head">
+              <h3 data-i18n="pr.sd.t">Selfie + Document</h3>
+              <code class="tier-badge tier-badge-featured">selfie_document</code>
+            </div>
+            <p class="price"><span data-price="selfie_document">0.08</span> <small data-i18n="pr.pr.unit">USDT per verification</small></p>
+            <p class="muted" data-i18n="pr.sd.p">Full biometric identity assurance: document verification + 1:1 face match + passive anti-spoofing.</p>
+            <ul class="ticks">
+              <li data-i18n="pr.sd.l1">Everything in Document check included</li>
+              <li data-i18n="pr.sd.l2">1:1 face match (document portrait ↔ live selfie)</li>
+              <li data-i18n="pr.sd.l3">Passive liveness anti-spoofing (single selfie)</li>
+              <li data-i18n="pr.sd.l4">Hosted link, direct API &amp; signed webhooks</li>
             </ul>
             <a class="btn btn-primary" href="https://kyc.pilotbot.net/dashboard/signup" data-signup data-i18n="cta.keys" rel="noopener">Get API keys</a>
           </article>
@@ -404,8 +429,9 @@ other      &rarr; approved</code></pre>
             <p class="price"><span data-i18n="pr.vo.price">Let's talk</span></p>
             <p class="muted" data-i18n="pr.vo.p">High volumes or special requirements.</p>
             <ul class="ticks">
-              <li data-i18n="pr.vo.l1">Volume pricing</li>
-              <li data-i18n="pr.vo.l2">Rate limit discussion</li>
+              <li data-i18n="pr.vo.l1">Custom volume pricing</li>
+              <li data-i18n="pr.vo.l2">Dedicated rate limits &amp; SLA</li>
+              <li data-i18n="pr.vo.l3">Priority integration support</li>
             </ul>
             <a class="btn btn-secondary" href="https://t.me/pilotbotnet" data-contact data-i18n="pr.vo.cta" rel="noopener">Contact us</a>
           </article>
@@ -427,7 +453,7 @@ other      &rarr; approved</code></pre>
           </details>
           <details>
             <summary data-i18n="faq.q2">How fast is a result?</summary>
-            <p data-i18n="faq.a2">Seconds for documents with an MRZ. Other documents (read by the AI) usually take from about 30 seconds up to 2 minutes. You are notified by webhook as soon as the decision is ready, or you can poll the session.</p>
+            <p data-i18n="faq.a2">1–2 seconds for documents with a valid MRZ. Other documents read by the AI typically finish in 10–30 seconds with automatic provider failover. You are notified by webhook as soon as the decision is ready, or you can poll the session.</p>
           </details>
           <details>
             <summary data-i18n="faq.q3">Do you store my users' photos?</summary>
@@ -451,7 +477,7 @@ other      &rarr; approved</code></pre>
           </details>
           <details>
             <summary data-i18n="faq.q8">How do I pay?</summary>
-            <p data-i18n="faq.a8">Top up a prepaid USDT balance in the dashboard with crypto via OxaPay (from 10 to 5000 USDT per top-up). Each live verification costs 0.05 USDT and is charged only when a decision is produced; if our engine fails, the check is refunded automatically. Pay the exact amount shown on the invoice; if you paid a different amount, contact support.</p>
+            <p data-i18n="faq.a8">Top up a prepaid USDT balance in the dashboard with crypto via OxaPay (from 10 to 5000 USDT per top-up). Live verifications cost 0.04 USDT for Document check (mode=document) and 0.08 USDT for Selfie + Document (mode=selfie_document), charged only when a decision is produced; if our engine fails, the check is refunded automatically. Pay the exact amount shown on the invoice; if you paid a different amount, contact support.</p>
           </details>
         </div>
       </div>

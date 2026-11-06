@@ -201,6 +201,10 @@ ul, ol { padding: 0; list-style: none; }
 .card h3, .feature h3 { font-size: 1.15rem; line-height: 1.3; margin-bottom: 8px; }
 .card-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); margin-bottom: 14px; }
 .card-icon svg, .icon { width: 24px; height: 24px; }
+.mode-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.mode-head .card-icon { margin-bottom: 0; }
+.mode-price { font: 700 13px/1.2 var(--font); padding: 6px 12px; border-radius: 999px; background: var(--bg-alt); border: 1px solid var(--border); color: var(--text); white-space: nowrap; }
+.mode-price-featured { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); color: var(--accent); }
 .feature .icon { color: var(--accent); margin-bottom: 12px; display: block; width: 28px; height: 28px; }
 .feature p { color: var(--muted); font-size: 15px; }
 
@@ -234,10 +238,14 @@ pre.mini code { font: inherit; }
 
 /* pricing */
 .price-card { display: flex; flex-direction: column; }
+.price-tier-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.price-tier-head h3 { margin-bottom: 0; }
+.tier-badge { font: 700 11px/1.2 var(--mono); padding: 4px 8px; border-radius: 6px; background: var(--bg-alt); border: 1px solid var(--border); color: var(--muted); white-space: nowrap; }
+.tier-badge-featured { background: var(--accent-soft); border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); color: var(--accent); }
 .price-card .btn { margin-top: auto; }
 .price-card .ticks { margin-bottom: 22px; }
-.price { font-size: 2.2rem; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 6px; line-height: 1.15; }
-.price small { font-size: .9rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.price { font-size: 2.2rem; font-weight: 800; letter-spacing: -.02em; margin: 6px 0 8px; line-height: 1.15; }
+.price small { display: inline-block; white-space: nowrap; font-size: .88rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
 
 /* faq */
 .faq { display: grid; gap: 10px; }

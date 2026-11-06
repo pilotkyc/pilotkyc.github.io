@@ -33,7 +33,7 @@ curl -X POST {{BASE_URL}}/checks \
 
 Live checks are charged from your [prepaid balance](#/billing): if it cannot cover the price, the call fails with `402 insufficient_balance` and nothing is processed.
 
-The call is synchronous. Documents with an MRZ return in seconds; other documents, read by the AI, usually take from about 30 seconds up to 2 minutes, so set a generous timeout in your HTTP client. For long waits, the [hosted flow](#/hosted-sessions) with a webhook is often more convenient.
+The call is synchronous. Documents with an MRZ return in seconds; other documents, read by the AI, usually take 10–30 seconds with automatic failover, so set a generous timeout in your HTTP client. For long waits, the [hosted flow](#/hosted-sessions) with a webhook is often more convenient.
 
 Response `200`: a Check object. It has the same shape as a finished session (see [Result object](#/result-object)) with `object: "check"`, an `id` starting with `chk_`, and no `url`.
 

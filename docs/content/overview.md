@@ -8,10 +8,10 @@ Base URL: `{{BASE_URL}}`
 
 Two verification modes cover the common onboarding cases:
 
-| `mode` | What your user provides | What PilotKYC checks |
-|---|---|---|
-| `document` | A photo of an identity document | The document is present and readable, authenticity signals, data extraction (name, date of birth, document number, nationality, expiry), MRZ checksum validation when the document has an MRZ, and an optional match against the name you expect |
-| `selfie_document` | A photo of the document **and** a live selfie | Everything from `document`, plus a face match between the document photo and the selfie, and passive liveness (anti-spoofing against a photo of a screen or a printed photo) |
+| `mode` | Price | What your user provides | What PilotKYC checks |
+|---|---|---|---|
+| `document` | **0.04 USDT** | A photo of an identity document | The document is present and readable, authenticity signals, data extraction (name, date of birth, document number, nationality, expiry), MRZ checksum validation when the document has an MRZ, and an optional match against the name you expect |
+| `selfie_document` | **0.08 USDT** | A photo of the document **and** a live selfie | Everything from `document`, plus a face match between the document photo and the selfie, and passive liveness (anti-spoofing against a photo of a screen or a printed photo) |
 
 Supported document types: `passport`, `national_id`, `driver_license`. See [Verification modes](#/modes).
 
@@ -27,7 +27,7 @@ You can use either style, or both:
 - **Authentication** is a server-side Bearer API key. `pk_live_` keys run real recognition; `pk_test_` keys use the free sandbox. See [Authentication](#/authentication).
 - **Result object** is the same shape for sessions and direct checks. See [Result object](#/result-object).
 - **Webhooks** are signed with HMAC-SHA256 in the `PilotKYC-Signature` header. See [Webhooks](#/webhooks).
-- **Billing** is prepaid: top up a USDT balance with crypto, 0.05 USDT per live verification, sandbox is free. See [Billing and balance](#/billing).
+- **Billing** is prepaid: top up a USDT balance with crypto, **0.04 USDT** per `document` verification and **0.08 USDT** per `selfie_document` verification, sandbox is free. See [Billing and balance](#/billing).
 - **Idempotency** keys make creating sessions and checks safe to retry. See [Idempotency](#/idempotency).
 - **Privacy**: images are deleted right after the check; personal data is kept at most 30 days by default and can be erased via the API at any time. See [Data retention and privacy](#/data-retention-and-privacy).
 

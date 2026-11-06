@@ -126,4 +126,4 @@ curl {{BASE_URL}}/sessions/ses_2b9f… \
 
 ## Go live
 
-Create a `pk_live_` key in the dashboard (this needs a confirmed email and your password) and [top up your balance](#/billing); each live verification costs 0.05 USDT. Swap the `pk_test_` key for the `pk_live_` key. Nothing else changes in your integration: same endpoints, same result object, same webhooks. If the balance is too low, creating a session or check returns [`402 insufficient_balance`](#/billing/insufficient-balance).
+Create a `pk_live_` key in the dashboard (this needs a confirmed email and your password) and [top up your balance](#/billing); live verifications cost **0.04 USDT** (`document`) or **0.08 USDT** (`selfie_document`). Swap the `pk_test_` key for the `pk_live_` key. Nothing else changes in your integration: same endpoints, same result object, same webhooks. If the balance is too low, creating a session or check returns [`402 insufficient_balance`](#/billing/insufficient-balance).
